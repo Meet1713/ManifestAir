@@ -3,48 +3,65 @@
 {% block content %}
 <style>
     /* 1. HERO ANIMATION */
-    @keyframes float-luxury {
+    @keyframes float-luxury 
+    {
         0% { transform: translate(0, 0) rotate(2deg); }
         33% { transform: translate(0, -15px) rotate(4deg); }
         66% { transform: translate(0, -5px) rotate(1deg); }
         100% { transform: translate(0, 0) rotate(2deg); }
     }
-    .hero-card-animate {
+
+    .hero-card-animate 
+    {
         transition: transform 0.1s ease;
     }
 
     /* 2. DESTINATION CARD HOVER */
-    .dest-card {
+    .dest-card 
+    {
         height: 350px;
         overflow: hidden;
         border-radius: 15px;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    .dest-card img {
+
+    .dest-card img 
+    {
         height: 100%;
         width: 100%;
         object-fit: cover;
         transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
-    .dest-card:hover img {
+
+    .dest-card:hover img 
+    {
         transform: scale(1.15);
     }
-    .dest-card:hover {
+
+    .dest-card:hover 
+    {
         transform: translateY(-5px);
         box-shadow: 0 10px 30px rgba(23, 162, 184, 0.2);
     }
 
     /* 3. FEATURE CARD HOVER */
-    .feature-card {
+    .feature-card 
+    {
         transition: transform 0.3s ease;
     }
-    .feature-card:hover {
+
+    .feature-card:hover 
+    {
         transform: translateY(-10px);
     }
-    .feature-icon {
+    
+    .feature-icon 
+    {
         transition: transform 0.3s ease;
     }
-    .feature-card:hover .feature-icon {
+    
+    .feature-card:hover .feature-icon 
+    {
         transform: scale(1.2);
         color: #fff !important;
     }
@@ -78,6 +95,7 @@
                         <div class="d-flex align-items-center">
                             <span class="h4 mb-0 fw-bold text-white">JFK</span>
                             <div class="mx-3 text-muted" style="border-top: 2px dashed #666; width: 40px; position: relative; top: 2px;">
+    
                                 <i class="fas fa-plane position-absolute top-50 start-50 translate-middle text-info" style="font-size: 0.8rem;"></i>
                             </div>
                             <span class="h4 mb-0 fw-bold text-white">LHR</span>
@@ -86,15 +104,18 @@
                     </div>
                     
                     <h2 class="display-3 fw-bold mb-0 text-white" style="text-shadow: 0 0 20px rgba(255,255,255,0.2);">$450</h2>
+    
                     <small class="text-info fw-bold d-block mb-4">
                         <i class="fas fa-check-circle me-1"></i> Price drop detected!
                     </small>
 
                     <div class="p-3 rounded" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05);">
+                        
                         <div class="d-flex justify-content-between text-muted small mb-2">
                             <span><i class="fas fa-plane-tail me-2"></i>Airline</span>
                             <span class="text-white">British Airways</span>
                         </div>
+
                         <div class="d-flex justify-content-between text-muted small">
                             <span><i class="far fa-calendar-alt me-2"></i>Depart</span>
                             <span class="text-white">Feb 14, 2026</span>
@@ -141,6 +162,7 @@
                 </div>
             </div>
         </div>
+        
         {% else %}
         <div class="col-12 text-center py-5">
             <p class="text-muted">No popular destinations configured yet.</p>
