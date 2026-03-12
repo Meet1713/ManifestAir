@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2><i class="fas fa-bell me-2 text-warning"></i>Smart Alerts</h2>
+        {% if notifications %}
+        <form action="{{ url_for('traveler.clear_notifications') }}" method="post">
+            <button class="btn btn-outline-secondary btn-sm">Mark All Read</button>
+        </form>
+        {% endif %}
+    </div>
+
+    {% if notifications %}
+        <div class="list-group">
+        {% for notif in notifications %}
+            <div class="list-group-item list-group-item-action flex-column align-items-start bg-dark text-white border-secondary mb-2 rounded {{ 'border-start border-4 border-warning' if not notif.is_read else '' }}">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1 text-success fw-bold">Price Drop Detected!</h5>
+                    <small class="text-muted">{{ notif.created_at }}</small>
+                </div>
+                <p class="mb-0">{{ notif.message }}</p>
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-4">
+            <i class="fas fa-check-circle fa-3x text-muted mb-3"></i>
+            <p class="text-muted">You are all caught up! No new alerts.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
