@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 class="mb-3">My Watchlist</h2>
+
+<div class="row">
+    {% for watch in watches %}
+    <div class="col-md-6 col-lg-4 mb-3">
+        <div class="neo-card p-3 position-relative">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="badge bg-secondary fw-light">{{ watch.depart_date }}</span>
+                {% if watch.is_active %}
+                    <span class="text-success small">● Active</span>
+                {% else %}
+                    <span class="text-danger small">● Inactive</span>
+                {% endif %}
+            </div>
+            
+            <h4 class="mb-2">
+                {{ watch.origin }} 
+                <span style="color: var(--accent);">&rarr;</span> 
+                {{ watch.destination }}
+            </h4>
+            
+            <div class="d-flex justify-content-between align-items-end">
+                <div>
+                    <small class="text-muted d-block">Threshold</small>
+                    <span class="fs-5">${{ watch.threshold_price }}</span>
+                </div>
+                <button class="btn btn-sm btn-dark rounded-circle" disabled>🗑️</button>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 text-center py-4">
+        <p class="text-muted">You are not tracking any flights yet.</p>
+        <a href="{{ url_for('traveler.search') }}" class="neo-btn">Start Searching</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
