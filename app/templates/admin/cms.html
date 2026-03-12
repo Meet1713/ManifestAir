@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <h2 class="fw-bold">Content Management <span class="text-info">CMS</span></h2>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-light btn-sm">
+            <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4 mb-5 mb-lg-0">
+            <div class="neo-card p-4">
+                <h4 class="mb-4"><i class="fas fa-plus-circle me-2"></i>Add Destination</h4>
+                
+                <form action="{{ url_for('admin.cms') }}" method="post">
+                    <div class="mb-3">
+                        <label class="text-muted small mb-1">City Name</label>
+                        <input type="text" name="city" class="form-control neo-input" placeholder="e.g. Tokyo" required>
+                        <div class="form-text text-info small mt-1">
+                            <i class="fas fa-magic me-1"></i> Country is auto-detected via GeoAPI
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="text-muted small mb-1">Deal Price ($)</label>
+                        <input type="number" name="price" class="form-control neo-input" placeholder="1200" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="text-muted small mb-1">Image URL</label>
+                        <input type="url" name="image" class="form-control neo-input" placeholder="https://source.unsplash.com/..." required>
+                        <div class="form-text text-muted small">
+                            Use a high-quality link (Unsplash, Pexels, etc.)
+                        </div>
+                    </div>
+
+                    <button type="submit" class="neo-btn w-100">
+                        Publish to Homepage
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="neo-card p-4">
+                <h4 class="mb-4">Active on Homepage</h4>
+                
+                {% if destinations %}
+                    <div class="d-flex flex-column gap-3">
+                        {% for dest in destinations %}
+                        <div class="p-3 rounded border border-secondary border-opacity-10 d-flex align-items-center justify-content-between" style="background: rgba(255,255,255,0.02);">
+                            
+                            <div class="d-flex align-items-center">
+                                <img src="{{ dest.image_url }}" alt="{{ dest.city }}" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                <div>
+                                    <h5 class="mb-0 fw-bold text-white">{{ dest.city }}</h5>
+                                    <small class="text-muted">{{ dest.country }}</small>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-4">
+                                <span class="text-success fw-bold fs-5">${{ dest.price_estimate }}</span>
+                                
+                                <form action="{{ url_for('admin.delete_dest', dest_id=dest.id) }}" method="post" onsubmit="return confirm('Are you sure you want to remove {{ dest.city }}?');">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-circle" style="width: 32px; height: 32px; padding: 0;">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="fas fa-globe-americas fa-3x mb-3 opacity-25"></i>
+                        <p>No destinations active yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
