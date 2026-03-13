@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="neo-card p-4">
+            <h2 class="text-center mb-4">Join ManifestAir</h2>
+            
+            <div id="alert-box" class="alert d-none"></div>
+
+            <form id="register-form">
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <label class="form-label text-muted small text-uppercase">First Name</label>
+                        <input type="text" id="first_name" class="neo-input" placeholder="e.g. John" required>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <label class="form-label text-muted small text-uppercase">Last Name</label>
+                        <input type="text" id="last_name" class="neo-input" placeholder="e.g. Doe" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small text-uppercase">Email Address</label>
+                    <input type="email" id="email" class="neo-input" placeholder="name@example.com" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small text-uppercase">Password</label>
+                    <input type="password" id="password" class="neo-input" placeholder="Min 8 chars, numbers & symbols" required>
+                    <div class="progress mt-2" style="height: 5px;">
+                        <div id="password-strength" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <small id="pass-help" class="text-muted" style="font-size: 0.75rem;">Must be 8+ chars with 1 number and 1 special character.</small>
+                </div>
+                
+                <button type="submit" class="neo-btn w-100" id="reg-btn">
+                    <span id="btn-text">Create Account</span>
+                    <span id="btn-spinner" class="spinner-border spinner-border-sm d-none"></span>
+                </button>
+            </form>
+
+            <div id="social-login-section">
+                <hr class="border-secondary opacity-25 my-4">
+                <button id="google-btn" class="btn btn-light w-100 rounded-pill fw-bold">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" class="me-2">
+                    Sign up with Google
+                </button>
+            </div>
+
+            <div id="success-state" class="text-center d-none">
+                <i class="fas fa-envelope-open-text fa-4x text-info mb-3"></i>
+                <h4>Verify Your Email</h4>
+                <p class="text-muted">
+                    We've sent a confirmation link to <strong id="sent-email" class="text-white"></strong>. 
+                    Please check your inbox (and spam folder) to activate your account.
+                </p>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light rounded-pill">I've Verified My Email</a>
+                    <button id="resend-btn" class="btn btn-link text-muted small">Resend Link</button>
+                    <p id="resend-msg" class="text-success small d-none">Email sent!</p>
+                </div>
+            </div>
+
+            <div class="text-center mt-3" id="login-link">
+                <small class="text-muted">Already have an account? <a href="{{ url_for('auth.login') }}" class="text-info">Login</a></small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, updateProfile, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAPBVYGu_VDd1h15MMOIQfdjExHUU7Ec6k",
+    authDomain: "manifestair-df2fa.firebaseapp.com",
+    projectId: "manifestair-df2fa",
+    storageBucket: "manifestair-df2fa.firebasestorage.app",
+    messagingSenderId: "368936646982",
+    appId: "1:368936646982:web:b63c6f68baab65d706cd47",
+    measurementId: "G-GC6T5FW96M"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // --- 1. Password Strength Logic ---
+  const passInput = document.getElementById('password');
+  const strengthBar = document.getElementById('password-strength');
+  
+  passInput.addEventListener('input', () => {
+      const val = passInput.value;
+      let strength = 0;
+      if (val.length >= 8) strength += 25;
+      if (val.match(/[A-Z]/)) strength += 25;
+      if (val.match(/[0-9]/)) strength += 25;
+      if (val.match(/[^a-zA-Z0-9]/)) strength += 25; 
+
+      strengthBar.style.width = strength + '%';
+      if(strength < 50) strengthBar.className = "progress-bar bg-danger";
+      else if(strength < 100) strengthBar.className = "progress-bar bg-warning";
+      else strengthBar.className = "progress-bar bg-success";
+  });
+
+  // --- 2. Email Signup Logic ---
+  document.getElementById('register-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const firstName = document.getElementById('first_name').value.trim();
+      const lastName = document.getElementById('last_name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      
+      const alertBox = document.getElementById('alert-box');
+      const btnText = document.getElementById('btn-text');
+      const btnSpinner = document.getElementById('btn-spinner');
+
+      // RESET UI
+      alertBox.classList.add('d-none');
+      btnText.classList.add('d-none');
+      btnSpinner.classList.remove('d-none');
+
+      // Name & Password Validation
+      const nameRegex = /^[a-zA-Z\s\-]+$/;
+      if (!nameRegex.test(firstName) || !nameRegex.test(lastName)) {
+          showError("Names should only contain letters.");
+          return;
+      }
+      const passRegex = /^(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{8,}$/;
+      if (!passRegex.test(password)) {
+          showError("Password too weak. Use 8+ chars, a number, and a symbol.");
+          return;
+      }
+
+      try {
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          const user = userCredential.user;
+
+          await updateProfile(user, { displayName: `${firstName} ${lastName}` });
+          await sendEmailVerification(user);
+
+          const idToken = await user.getIdToken();
+          await fetch("{{ url_for('auth.firebase_register_db') }}", {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ 
+                  token: idToken,
+                  first_name: firstName,
+                  last_name: lastName
+              })
+          });
+
+          // Show Success State
+          document.getElementById('register-form').classList.add('d-none');
+          document.getElementById('social-login-section').classList.add('d-none');
+          document.getElementById('login-link').classList.add('d-none');
+          document.getElementById('success-state').classList.remove('d-none');
+          document.getElementById('sent-email').textContent = email;
+
+      } catch (error) {
+          console.error(error);
+          let msg = error.message;
+          if (error.code === 'auth/email-already-in-use') msg = "That email is already registered. Try logging in.";
+          showError(msg);
+      }
+  });
+
+  // --- 3. FIX: RESEND EMAIL LOGIC ---
+  document.getElementById('resend-btn').addEventListener('click', async () => {
+      if (auth.currentUser) {
+          try {
+              await sendEmailVerification(auth.currentUser);
+              const msg = document.getElementById('resend-msg');
+              msg.classList.remove('d-none');
+              msg.textContent = "Email sent! Check Spam folder.";
+              setTimeout(() => msg.classList.add('d-none'), 5000);
+          } catch (e) {
+              alert("Error sending email: " + e.message);
+          }
+      }
+  });
+
+  // --- 4. Google Signup Logic ---
+  document.getElementById('google-btn').addEventListener('click', async () => {
+      const provider = new GoogleAuthProvider();
+      try {
+          const result = await signInWithPopup(auth, provider);
+          const idToken = await result.user.getIdToken();
+
+          const response = await fetch("{{ url_for('auth.firebase_login') }}", {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ token: idToken })
+          });
+
+          const data = await response.json();
+          if (response.ok) {
+              window.location.href = data.redirect;
+          } else {
+              alert("Google Sign-In Error: " + data.error);
+          }
+      } catch (error) {
+          console.error(error);
+          alert("Google Sign-In Error: " + error.message);
+      }
+  });
+
+  function showError(msg) {
+      const alertBox = document.getElementById('alert-box');
+      const btnText = document.getElementById('btn-text');
+      const btnSpinner = document.getElementById('btn-spinner');
+      
+      alertBox.textContent = msg;
+      alertBox.className = "alert alert-danger"; 
+      alertBox.classList.remove('d-none');
+      
+      btnText.classList.remove('d-none');
+      btnSpinner.classList.add('d-none');
+  }
+</script>
+{% endblock %}

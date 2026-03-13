@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="neo-card p-4">
+            <h2 class="text-center mb-4">Welcome Back</h2>
+
+            <div id="error-alert" class="alert alert-danger d-none">
+                <span id="error-msg"></span>
+                <button id="alert-resend-btn" class="btn btn-sm btn-outline-danger mt-2 d-none">Resend Verification Email</button>
+                <p id="alert-resend-status" class="small mt-1 text-success d-none"></p>
+            </div>
+
+            <form id="login-form">
+                <div class="mb-3">
+                    <label class="form-label text-muted">Email Address</label>
+                    <input type="email" id="email" class="neo-input" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label text-muted">Password</label>
+                    <input type="password" id="password" class="neo-input" required>
+                    <div class="text-end mt-1">
+                        <a href="{{ url_for('auth.reset_password') }}" class="text-muted small text-decoration-none">Forgot Password?</a>
+                    </div>
+                </div>
+                <button type="submit" class="neo-btn w-100" id="login-btn">
+                    <span id="btn-text">Sign In</span>
+                    <span id="btn-spinner" class="spinner-border spinner-border-sm d-none"></span>
+                </button>
+            </form>
+
+            <hr class="border-secondary opacity-25 my-4">
+            
+            <button id="google-btn" class="btn btn-light w-100 rounded-pill fw-bold">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" class="me-2">
+                Sign in with Google
+            </button>
+
+            <div class="text-center mt-3">
+                <small class="text-muted">Don't have an account? <a href="{{ url_for('auth.register') }}" class="text-info">Sign Up</a></small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, sendEmailVerification } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
+  // Configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyAPBVYGu_VDd1h15MMOIQfdjExHUU7Ec6k",
+    authDomain: "manifestair-df2fa.firebaseapp.com",
+    projectId: "manifestair-df2fa",
+    storageBucket: "manifestair-df2fa.firebasestorage.app",
+    messagingSenderId: "368936646982",
+    appId: "1:368936646982:web:b63c6f68baab65d706cd47",
+    measurementId: "G-GC6T5FW96M"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  let tempUser = null; // Store user temporarily to enable resend
+
+  // --- 1. Email/Password Login ---
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const pass = document.getElementById('password').value;
+      
+      const btnText = document.getElementById('btn-text');
+      const btnSpinner = document.getElementById('btn-spinner');
+      const errorAlert = document.getElementById('error-alert');
+      const errorMsg = document.getElementById('error-msg');
+      const resendBtn = document.getElementById('alert-resend-btn');
+
+      // UI Loading State
+      btnText.classList.add('d-none');
+      btnSpinner.classList.remove('d-none');
+      errorAlert.classList.add('d-none');
+      resendBtn.classList.add('d-none'); // Hide resend by default
+
+      try {
+          // A. Authenticate
+          const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+          const user = userCredential.user;
+
+          // B. Check Verification
+          if (!user.emailVerified) {
+              tempUser = user; // Save for resend
+              resendBtn.classList.remove('d-none'); // Show resend button
+              throw new Error("Email not verified. Please check your inbox (and Spam).");
+          }
+
+          // C. Get Token & Login
+          const idToken = await user.getIdToken();
+          const response = await fetch("{{ url_for('auth.firebase_login') }}", {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ token: idToken })
+          });
+
+          const data = await response.json();
+          if (response.ok) {
+              window.location.href = data.redirect;
+          } else {
+              throw new Error(data.error);
+          }
+
+      } catch (error) {
+          console.error(error);
+          errorMsg.textContent = error.message;
+          errorAlert.classList.remove('d-none');
+          btnText.classList.remove('d-none');
+          btnSpinner.classList.add('d-none');
+      }
+  });
+
+  // --- 2. RESEND LOGIC ---
+  document.getElementById('alert-resend-btn').addEventListener('click', async (e) => {
+      e.preventDefault(); // Prevent form submit
+      const status = document.getElementById('alert-resend-status');
+      
+      if (tempUser) {
+          try {
+              await sendEmailVerification(tempUser);
+              status.textContent = "Verification email sent!";
+              status.classList.remove('d-none');
+          } catch (err) {
+              status.textContent = "Error sending email. Try again later.";
+              status.classList.remove('d-none');
+          }
+      }
+  });
+
+  // --- 3. Google Login ---
+  document.getElementById('google-btn').addEventListener('click', async () => {
+      const provider = new GoogleAuthProvider();
+      try {
+          const result = await signInWithPopup(auth, provider);
+          const idToken = await result.user.getIdToken();
+
+          const response = await fetch("{{ url_for('auth.firebase_login') }}", {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ token: idToken })
+          });
+
+          const data = await response.json();
+          if (response.ok) {
+              window.location.href = data.redirect;
+          }
+      } catch (error) {
+          console.error(error);
+          alert("Google Sign-In Error: " + error.message);
+      }
+  });
+</script>
+
+{% endblock %}
