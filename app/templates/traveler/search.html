@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container py-4">
     
-    <div class="neo-card p-4 mb-4">
+    <div class="neo-card p-4 mb-5">
         <h2 class="fw-bold mb-4 text-center">Where to next?</h2>
         
         <form method="post" action="{{ url_for('traveler.search') }}">
@@ -79,7 +79,7 @@
                         <div class="text-start">
                             <span class="h5 mb-0">{{ origin }}</span>
                         </div>
-                        <div class="px-2 text-center">
+                        <div class="px-3 text-center">
                             <small class="text-muted d-block">{{ flight.duration }}</small>
                             <div class="progress" style="height: 2px; width: 100px;">
                                 <div class="progress-bar bg-info" role="progressbar" style="width: 100%"></div>
@@ -112,7 +112,7 @@
                             </button>
                         </form>
                         
-                        <a href="{{ flight.deep_link }}" target="_blank" class="btn btn-primary btn-sm px-3">
+                        <a href="{{ flight.deep_link }}" target="_blank" class="btn btn-primary btn-sm px-4">
                             Select <i class="fas fa-arrow-right ms-1"></i>
                         </a>
                     </div>
