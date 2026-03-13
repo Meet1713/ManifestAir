@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
+<div class="d-flex justify-content-between align-items-center mb-4">
     <h4>Results for {{ search_params.origin }} <span class="text-muted">&rarr;</span> {{ search_params.destination }}</h4>
     <button type="button" class="neo-btn" data-bs-toggle="modal" data-bs-target="#watchModal">
         🔔 Watch This Route
@@ -11,8 +11,8 @@
 {% if flights %}
     <div class="row">
         {% for flight in flights %}
-        <div class="col-md-12 mb-2">
-            <div class="neo-card d-flex flex-wrap align-items-center justify-content-between p-3">
+        <div class="col-md-12 mb-3">
+            <div class="neo-card d-flex flex-wrap align-items-center justify-content-between p-4">
                 <div class="col-md-3">
                     <h5 class="mb-0">{{ flight.airline }}</h5>
                     <small class="text-muted">{{ flight.provider }}</small>
@@ -25,14 +25,14 @@
                     <h3 class="mb-0" style="color: var(--accent);">${{ flight.price }}</h3>
                 </div>
                 <div class="col-md-2 text-end mt-2 mt-md-0">
-                    <a href="{{ flight.link }}" target="_blank" class="btn btn-outline-light rounded-pill px-3">Select</a>
+                    <a href="{{ flight.link }}" target="_blank" class="btn btn-outline-light rounded-pill px-4">Select</a>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
 {% else %}
-    <div class="text-center py-4">
+    <div class="text-center py-5">
         <h3 class="text-muted">No flights found.</h3>
         <p>Try changing your dates or using Mock Mode if API quota is exceeded.</p>
     </div>
@@ -51,7 +51,7 @@
                     <input type="hidden" name="destination" value="{{ search_params.destination }}">
                     <input type="hidden" name="date" value="{{ search_params.date }}">
                     
-                    <div class="mb-2">
+                    <div class="mb-3">
                         <label class="form-label">Notify me if price drops below (CAD):</label>
                         <input type="number" name="threshold" class="neo-input" placeholder="e.g. 500" required>
                     </div>
