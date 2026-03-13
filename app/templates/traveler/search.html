@@ -134,12 +134,14 @@
 <div id="exchange-rate-data" data-rate="{{ current_rate }}"></div>
 
 <script>
+    // 1. Logic for Return Date toggle
     function toggleReturnDate() {
         const isRoundTrip = document.getElementById('round_trip').checked;
         const returnDiv = document.getElementById('return-div');
         returnDiv.style.display = isRoundTrip ? 'block' : 'none';
     }
 
+    // 2. Logic for Currency Conversion
     document.getElementById('currencyToggle')?.addEventListener('change', function() {
         const isCAD = this.checked;
         const rate = parseFloat(document.getElementById('exchange-rate-data').dataset.rate);
@@ -148,11 +150,13 @@
         prices.forEach(el => {
             const usdPrice = parseFloat(el.dataset.usd);
             if (isCAD) {
+                // Convert to CAD
                 const cadPrice = (usdPrice * rate).toFixed(2);
                 el.innerText = "C$" + cadPrice;
                 el.classList.remove('text-success');
-                el.classList.add('text-info');
+                el.classList.add('text-info'); // Change color to indicate change
             } else {
+                // Revert to USD
                 el.innerText = "$" + usdPrice;
                 el.classList.add('text-success');
                 el.classList.remove('text-info');
@@ -160,6 +164,7 @@
         });
     });
 
+    // Run on load
     window.onload = toggleReturnDate;
 </script>
 {% endblock %}
