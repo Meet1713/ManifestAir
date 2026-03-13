@@ -11,7 +11,7 @@
 {% if flights %}
     <div class="row">
         {% for flight in flights %}
-        <div class="col-md-12 mb-3">
+        <div class="col-md-12">
             <div class="neo-card d-flex flex-wrap align-items-center justify-content-between p-4">
                 <div class="col-md-3">
                     <h5 class="mb-0">{{ flight.airline }}</h5>
@@ -24,7 +24,7 @@
                 <div class="col-md-3 text-end">
                     <h3 class="mb-0" style="color: var(--accent);">${{ flight.price }}</h3>
                 </div>
-                <div class="col-md-2 text-end mt-2 mt-md-0">
+                <div class="col-md-2 text-end">
                     <a href="{{ flight.link }}" target="_blank" class="btn btn-outline-light rounded-pill px-4">Select</a>
                 </div>
             </div>
