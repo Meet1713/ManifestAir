@@ -11,3 +11,12 @@ class MockProvider(FlightProvider):
     ("Air France", "https://logo.clearbit.com/airfrance.com"),
     ("Virgin Atlantic", "https://logo.clearbit.com/virginatlantic.com")
 ]
+    for _ in range(random.randint(4, 6)):
+    airline_name, airline_logo = random.choice(airlines)
+    price = random.randint(400, 1200)
+    dep_h = random.randint(6, 22)
+arr_h = (dep_h + random.randint(3, 12)) % 24
+dep_min = random.choice(["00", "15", "30", "45"])
+arr_min = random.choice(["00", "15", "30", "45"])
+
+time_str = f"{dep_h:02}:{dep_min} - {arr_h:02}:{arr_min}"
