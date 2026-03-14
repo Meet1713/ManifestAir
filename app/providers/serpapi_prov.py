@@ -90,7 +90,9 @@ class SerpApiProvider:
             search = serpapi.GoogleSearch(params)
             results = search.get_dict()
             
-           
+            if "error" in results:
+                print(f"❌ SerpApi Error: {results['error']}")
+                return []
 
             flight_list = []
             sources = []
