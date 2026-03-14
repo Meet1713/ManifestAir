@@ -20,3 +20,13 @@ dep_min = random.choice(["00", "15", "30", "45"])
 arr_min = random.choice(["00", "15", "30", "45"])
 
 time_str = f"{dep_h:02}:{dep_min} - {arr_h:02}:{arr_min}"
+flight = {
+    'provider': airline_name,
+    'logo': airline_logo,
+    'price': price,
+    'stops': random.choice([0, 1]),
+    'duration': f"{random.randint(5, 14)}h {random.randint(10, 50)}m",
+    'time': time_str,
+    'type': 'Round Trip' if return_date else 'One Way',
+    'deep_link': "#"
+}
