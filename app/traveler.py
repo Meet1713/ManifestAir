@@ -58,13 +58,51 @@ def search():
                            return_date=return_date,
                            trip_type=trip_type)
 
-# @bp.route('/watch', methods=['POST'])
+@bp.route('/watch', methods=['POST'])
+def watch_route():
+    origin = request.form['origin']
+    destination = request.form['destination']
+    price = float(request.form['price'])
+    # Default depart date for the watch (simplified for MVP, sets it to 7 days from now)
+    import datetime
+    depart_date = datetime.date.today() + datetime.timedelta(days=7)
+    
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute(
+        "INSERT INTO watches (user_id, origin, destination, depart_date, threshold_price) VALUES (%s, %s, %s, %s, %s)",
+        (g.user['id'], origin, destination, depart_date, price)
+    )
+    flash(f"Now watching {origin} -> {destination} for price drops below ${price}")
+    return redirect(url_for('traveler.dashboard'))
 
-# @bp.route('/delete_watch/<int:id>', methods=['POST'])
+@bp.route('/delete_watch/<int:id>', methods=['POST'])
+def delete_watch(id):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("DELETE FROM watches WHERE id = %s AND user_id = %s", (id, g.user['id']))
+    flash("Watch removed.")
+    return redirect(url_for('traveler.dashboard'))
 
 
-# @bp.route("/notifications")
-# def notifications():
-#     return "<h1>Traveler notifications coming soon</h1>"
+@bp.route('/notifications')
+@login_required
+def notifications():
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM notifications WHERE user_id = %s ORDER BY created_at DESC", (g.user['id'],))
+    notifs = cursor.fetchall()
+    
+    # Mark as read immediately when viewed
+    cursor.execute("UPDATE notifications SET is_read = TRUE WHERE user_id = %s", (g.user['id'],))
+    
+    return render_template('traveler/notifications.html', notifications=notifs)
 
-# @bp.route('/notifications/clear', methods=['POST'])
+@bp.route('/notifications/clear', methods=['POST'])
+@login_required
+def clear_notifications():
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("UPDATE notifications SET is_read = TRUE WHERE user_id = %s", (g.user['id'],))
+    flash("Notifications cleared.")
+    return redirect(url_for('traveler.notifications'))
