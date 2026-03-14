@@ -2,7 +2,9 @@ from flask import
 (
     Blueprint, render_template, request, flash, redirect, url_for, g, session
 )
-# Import few segments from the files
+from app.auth import login_required
+from app.db import get_db
+from app.patterns.factory import ProviderFactory
 
 bp = Blueprint("traveler", __name__, url_prefix="/traveler")
 
@@ -14,7 +16,6 @@ def traveler_only():
         return redirect(url_for('auth.login'))
 
 @bp.route("/dashboard")
-# Have to write some code here
 def dashboard():
     db = get_db()
     cursor = db.cursor(dictionary=True)
@@ -30,6 +31,32 @@ def search():
     depart_date = ""
     return_date = ""
     trip_type = "one_way" # Default
+
+    if request.method == 'POST':
+        origin = request.form.get('origin')
+        destination = request.form.get('destination')
+        depart_date = request.form.get('date')
+        return_date = request.form.get('return_date')
+        trip_type = request.form.get('trip_type')
+        
+        # If One Way selected, clear the return date so the Provider knows logic to use
+        if trip_type == 'one_way':
+            return_date = None
+        
+        # Get the correct provider (Mock or Live) from our Factory
+        provider = ProviderFactory.get_provider()
+        
+        # Pass all arguments to the provider
+        # The new serpapi_prov.py is expecting these 4 arguments now
+        results = provider.search_flights(origin, destination, depart_date, return_date)
+        
+    return render_template('traveler/search.html', 
+                           results=results, 
+                           origin=origin, 
+                           destination=destination, 
+                           date=depart_date,
+                           return_date=return_date,
+                           trip_type=trip_type)
 
 @bp.route('/watch', methods=['POST'])
 
