@@ -152,4 +152,30 @@ class SerpApiProvider:
         """)
         db.commit()
 
-    
+    def _extract_time(self, flight):
+        """
+        Improved extraction: looks for 'departure_airport' -> 'time' first.
+        """
+        try:
+            legs = flight.get('flights', [])
+            if not legs: return "N/A"
+            
+            # Method 1: Look inside airport objects (Standard SerpApi format)
+            # The format is usually "2026-02-02 10:00"
+            dep_full = legs[0].get('departure_airport', {}).get('time', '')
+            arr_full = legs[-1].get('arrival_airport', {}).get('time', '')
+            
+            # Method 2: Fallback to tokens if airport time is missing
+            if not dep_full: dep_full = legs[0].get('departure_token', '')
+            if not arr_full: arr_full = legs[-1].get('arrival_token', '')
+            
+            # Extract just the time part (HH:MM)
+            dep_time = dep_full.split(' ')[-1] if ' ' in dep_full else dep_full
+            arr_time = arr_full.split(' ')[-1] if ' ' in arr_full else arr_full
+            
+            if dep_time and arr_time:
+                return f"{dep_time} - {arr_time}"
+                
+            return "See Details"
+        except:
+            return "See Details"
