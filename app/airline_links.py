@@ -3,7 +3,7 @@ A dictionary mapping airline names to their official booking websites.
 """
 
 AIRLINE_WEBSITES = {
-    # North America
+    # North America  
     "Delta": "https://www.delta.com",
     "Delta Air Lines": "https://www.delta.com",
     "United": "https://www.united.com",
