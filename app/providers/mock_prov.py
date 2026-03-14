@@ -30,3 +30,6 @@ flight = {
     'type': 'Round Trip' if return_date else 'One Way',
     'deep_link': "#"
 }
+results.append(flight)
+results.sort(key=lambda x: x['price'])
+return results
