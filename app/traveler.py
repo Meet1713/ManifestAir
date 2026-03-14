@@ -58,13 +58,13 @@ def search():
                            return_date=return_date,
                            trip_type=trip_type)
 
-@bp.route('/watch', methods=['POST'])
+# @bp.route('/watch', methods=['POST'])
 
-@bp.route('/delete_watch/<int:id>', methods=['POST'])
+# @bp.route('/delete_watch/<int:id>', methods=['POST'])
 
 
-@bp.route("/notifications")
-def notifications():
-    return "<h1>Traveler notifications coming soon</h1>"
+# @bp.route("/notifications")
+# def notifications():
+#     return "<h1>Traveler notifications coming soon</h1>"
 
-@bp.route('/notifications/clear', methods=['POST'])
+# @bp.route('/notifications/clear', methods=['POST'])
