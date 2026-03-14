@@ -22,7 +22,22 @@ def dashboard():
     cursor.execute("SELECT * FROM watches WHERE user_id = %s", (g.user['id'],))
     watches = cursor.fetchall()
     return render_template('traveler/dashboard.html', watches=watches)
-    
+@dp.route('/search', methods=('GET', 'POST'))  
+def search():
+    results = []
+    origin = ""
+    destination = ""
+    depart_date = ""
+    return_date = ""
+    trip_type = "one_way" # Default
+
+@bp.route('/watch', methods=['POST'])
+
+@bp.route('/delete_watch/<int:id>', methods=['POST'])
+
+
 @bp.route("/notifications")
 def notifications():
     return "<h1>Traveler notifications coming soon</h1>"
+
+@bp.route('/notifications/clear', methods=['POST'])
