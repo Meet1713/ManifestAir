@@ -10,6 +10,8 @@ bp = Blueprint("traveler", __name__, url_prefix="/traveler")
 @login_required
 def traveler_only():
     # Only Travelers and Admins can access these routes
+    if g.user['role'] != 'traveler' and g.user['role'] != 'admin':
+        return redirect(url_for('auth.login'))
 
 @bp.route("/dashboard")
 # Have to write some code here
