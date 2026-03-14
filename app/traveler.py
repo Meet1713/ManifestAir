@@ -16,8 +16,13 @@ def traveler_only():
 @bp.route("/dashboard")
 # Have to write some code here
 def dashboard():
-    return "<h1>Traveler dashboard coming soon</h1>" #Finish this segment
-
+    db = get_db()
+    cursor = db.cursor(dictionary=True)
+    # Fetch User's Watchlist
+    cursor.execute("SELECT * FROM watches WHERE user_id = %s", (g.user['id'],))
+    watches = cursor.fetchall()
+    return render_template('traveler/dashboard.html', watches=watches)
+    
 @bp.route("/notifications")
 def notifications():
     return "<h1>Traveler notifications coming soon</h1>"
