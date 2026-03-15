@@ -1,7 +1,4 @@
-from flask import
-(
-    Blueprint, render_template, request, flash, redirect, url_for, g, session
-)
+from flask import Blueprint, render_template, request, flash, redirect, url_for, g, session
 from app.auth import login_required
 from app.db import get_db
 from app.patterns.factory import ProviderFactory
@@ -23,7 +20,7 @@ def dashboard():
     cursor.execute("SELECT * FROM watches WHERE user_id = %s", (g.user['id'],))
     watches = cursor.fetchall()
     return render_template('traveler/dashboard.html', watches=watches)
-@dp.route('/search', methods=('GET', 'POST'))  
+@bp.route('/search', methods=('GET', 'POST'))  
 def search():
     results = []
     origin = ""
