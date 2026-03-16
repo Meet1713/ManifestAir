@@ -1,3 +1,7 @@
+"""
+RUN THIS SCRIPT ONCE TO CREATE AN ADMIN USER.
+Usage: python seed_admin.py
+"""
 import os
 from dotenv import load_dotenv
 
@@ -9,22 +13,27 @@ from app.db import get_db
 from werkzeug.security import generate_password_hash
 
 app = create_app()
+
 def create_admin():
+    # Ensure we are inside the application context so we can access the DB
     with app.app_context():
         db = get_db()
-
+        
+        # Check if DB connection succeeded
         if db is None:
             print("Error: Could not connect to the database.")
             print("Check your .env file and ensure DB_HOST is set.")
             return
 
         cursor = db.cursor()
-
+        
+        # Admin Credentials
         email = "admin@manifestair.com"
-        password = "adminpassword123"
+        password = "adminpassword123" 
         first_name = "System"
         last_name = "Administrator"
         dob = "2000-01-01"
+        
         print(f"--- Connecting to: {app.config['DATABASE_HOST']} ---")
         
         try:
