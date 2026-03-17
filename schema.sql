@@ -24,3 +24,46 @@ CREATE TABLE watches (
     last_checked TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+-- Price History
+CREATE TABLE price_snapshots (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    watch_id INT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    provider VARCHAR(100),
+    recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (watch_id) REFERENCES watches(id) ON DELETE CASCADE
+);
+
+-- Notifications
+CREATE TABLE notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    message TEXT NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Global Settings
+CREATE TABLE settings (
+    setting_key VARCHAR(50) PRIMARY KEY,
+    setting_value VARCHAR(255)
+);
+
+-- System Metrics
+CREATE TABLE system_metrics (
+    metric_key VARCHAR(50) PRIMARY KEY,
+    metric_value INT DEFAULT 0,
+    last_updated DATE
+);
+
+-- CMS: Popular Destinations
+CREATE TABLE destinations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    city VARCHAR(50) NOT NULL,
+    country VARCHAR(50) NOT NULL,
+    price_estimate INT NOT NULL,
+    image_url VARCHAR(500),
+    is_active BOOLEAN DEFAULT TRUE
+);
