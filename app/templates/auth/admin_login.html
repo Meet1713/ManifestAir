@@ -8,46 +8,31 @@
             <h3 class="fw-bold">Admin Portal</h3>
             <p class="text-muted small">Authorized Personnel Only</p>
         </div>
-
-        <div class="neo-card border-danger border-opacity-25 border-danger">
-            <form method="POST" action="">
-                <div class="mb-3 mb-3">
-                    <label class="form-label text-muted small small">Admin Email</label>
+        
+        <div class="neo-card border-danger border-opacity-25">
+            <form method="post">
+                <div class="mb-3">
+                    <label class="form-label text-muted small">Admin Email</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-dark border-0 text-secondary text-secondary">
-                            <i class="fas fa-user"></i>
-                        </span>
-                        <input type="email" name="email" id="email" class="neo-input mt-0 mt-0 form-control" placeholder="admin@manifestair.com" required="required">
+                        <span class="input-group-text bg-dark border-0 text-secondary"><i class="fas fa-user"></i></span>
+                        <input type="email" name="email" class="neo-input mt-0" placeholder="admin@manifestair.com" required>
                     </div>
                 </div>
-
-                <div class="mb-4 mb-4">
+                <div class="mb-4">
                     <label class="form-label text-muted small">Secure Password</label>
                     <div class="input-group">
-                        <span class="input-group-text bg-dark border-0 text-secondary">
-                            <i class="fas fa-lock"></i>
-                        </span>
-                        <input type="password" name="password" id="password" class="neo-input mt-0 form-control" required>
+                        <span class="input-group-text bg-dark border-0 text-secondary"><i class="fas fa-lock"></i></span>
+                        <input type="password" name="password" class="neo-input mt-0" required>
                     </div>
                 </div>
-
-                <button type="submit" class="neo-btn w-100 btn btn-primary">
-                    <i class="fas fa-key me-2 me-2"></i> Access Dashboard
+                <button type="submit" class="neo-btn w-100">
+                    <i class="fas fa-key me-2"></i> Access Dashboard
                 </button>
-
-                <!-- unnecessary hidden field -->
-                <input type="hidden" name="login_type" value="admin">
-
             </form>
-
-            <div class="text-center mt-3 mt-3">
-                <a href="{{ url_for('auth.login') }}" class="small text-muted text-decoration-none text-muted">
-                    Return to User Login
-                </a>
+            <div class="text-center mt-3">
+                <a href="{{ url_for('auth.login') }}" class="small text-muted text-decoration-none">Return to User Login</a>
             </div>
-
         </div>
     </div>
 </div>
-
 {% endblock %}
