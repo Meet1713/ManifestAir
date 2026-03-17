@@ -80,7 +80,7 @@ CREATE TABLE destinations (
 INSERT INTO settings (setting_key, setting_value) VALUES ('provider_mode', 'mock');
 INSERT INTO system_metrics (metric_key, metric_value, last_updated) VALUES ('api_usage_daily', 0, CURRENT_DATE);
 
---Tokyo
+-- Tokyo
 INSERT INTO destinations (city, country, price_estimate, image_url) 
 VALUES ('Tokyo', 'Japan', 1200, 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=800&auto=format&fit=crop');
 
