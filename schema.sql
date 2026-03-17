@@ -1,3 +1,11 @@
+DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS price_snapshots;
+DROP TABLE IF EXISTS watches;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS settings;
+DROP TABLE IF EXISTS destinations;
+DROP TABLE IF EXISTS system_metrics;
+
 -- User Accounts
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
