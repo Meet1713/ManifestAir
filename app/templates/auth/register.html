@@ -68,24 +68,17 @@
 </div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, updateProfile, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, updateProfile, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
   const firebaseConfig = {
-    // apiKey: "AIzaSyAPBVYGu_VDd1h15MMOIQfdjExHUU7Ec6k",
-    // authDomain: "manifestair-df2fa.firebaseapp.com",
-    // projectId: "manifestair-df2fa",
-    // storageBucket: "manifestair-df2fa.firebasestorage.app",
-    // messagingSenderId: "368936646982",
-    // appId: "1:368936646982:web:b63c6f68baab65d706cd47",
-    // measurementId: "G-GC6T5FW96M"
-    apiKey: "AIzaSyBOq3KI73-k99b8cWaSkn9Fjox9g3oTFtg",
-    authDomain: "manifestair-30663.firebaseapp.com",
-    projectId: "manifestair-30663",
-    storageBucket: "manifestair-30663.firebasestorage.app",
-    messagingSenderId: "1004214493283",
-    appId: "1:1004214493283:web:9f0e81364049e0d8be5856",
-    measurementId: "G-KJ3MCHZ1Q2"
+    apiKey: "AIzaSyAPBVYGu_VDd1h15MMOIQfdjExHUU7Ec6k",
+    authDomain: "manifestair-df2fa.firebaseapp.com",
+    projectId: "manifestair-df2fa",
+    storageBucket: "manifestair-df2fa.firebasestorage.app",
+    messagingSenderId: "368936646982",
+    appId: "1:368936646982:web:b63c6f68baab65d706cd47",
+    measurementId: "G-GC6T5FW96M"
   };
 
   const app = initializeApp(firebaseConfig);
