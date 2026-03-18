@@ -226,3 +226,7 @@ input:-webkit-autofill:active {
 .neo-card.border-danger.border-opacity-25 .text-center.mt-3 {
     margin-top: 1.25rem !important;
 }
+/* Hide Google sign-in button on login page */
+#google-btn {
+    display: none !important;
+}
