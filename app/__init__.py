@@ -23,11 +23,11 @@ def create_app(test_config=None):
     app.register_blueprint(main.bp)
     app.register_blueprint(traveler.bp)
     app.register_blueprint(admin.bp)
-
+    """
     @app.before_request
     def load_user():
         g.user = None
-
+    """
     @app.route("/favicon.ico")
     def favicon():
         return "", 204
