@@ -62,7 +62,12 @@ def init_db():
 
 @click.command('init-db')
 def init_db_command():
-    """Clear the existing data and create new tables."""
+    """Create database tables."""
+    db = get_db()
+    if db is None:
+        click.echo('Database initialization failed.')
+        return
+
     init_db()
     click.echo('Initialized the database.')
 
