@@ -10,12 +10,12 @@ def init_firebase():
 
         if firebase_json:
             try:
-            cred_dict = json.loads(firebase_json)
-            cred = credentials.Certificate(cred_dict)
-            firebase_admin.initialize_app(cred)
-            print("🔥 Firebase Admin SDK Initialized successfully from environment.")
+                cred_dict = json.loads(firebase_json)
+                cred = credentials.Certificate(cred_dict)
+                firebase_admin.initialize_app(cred)
+                print("🔥 Firebase Admin SDK Initialized successfully from environment.")
             except Exception as e:
-            print(f"❌ Firebase initialization error: {e}")
+                print(f"❌ Firebase initialization error: {e}")
         else:
             print("⚠️ FIREBASE_SERVICE_ACCOUNT_JSON not set. Firebase Auth will fail.")
 
@@ -28,6 +28,6 @@ def verify_token(id_token):
         # FIX: Added clock_skew_seconds=5
         decoded_token = auth.verify_id_token(id_token, clock_skew_seconds=5)
         return decoded_token
-    except Exception as e:
+    except Exception as e:  
         print(f"❌ Token Verification Failed: {e}")
         return None
