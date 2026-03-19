@@ -12,7 +12,7 @@ ESSENTIAL_CITY_MAPPINGS = {
     "new york": "JFK", "london": "LHR", "tokyo": "HND", "paris": "CDG",
     "dubai": "DXB", "singapore": "SIN", "bangkok": "BKK", "hong kong": "HKG",
     "seoul": "ICN", "miami": "MIA", "los angeles": "LAX", "chicago": "ORD",
-    "toronto": "YYZ", "sydney": "SYD", "mumbai": "BOM", "delhi": "DEL",
+    "toronto": "YYZ", "regina": "YQR", "vancouver": "YVR", "ahmedabad": "AMD", "sydney": "SYD", "mumbai": "BOM", "delhi": "DEL",
     "shanghai": "PVG", "beijing": "PEK", "moscow": "SVO", "istanbul": "IST",
     "amsterdam": "AMS", "frankfurt": "FRA", "madrid": "MAD", "rome": "FCO",
     "barcelona": "BCN", "milan": "MXP", "munich": "MUC", "zurich": "ZRH",
