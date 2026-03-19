@@ -46,7 +46,8 @@ class SerpApiProvider:
             if db_code: return db_code
             
         for city, code in ESSENTIAL_CITY_MAPPINGS.items():
-            if clean_input in city: return code
+            if clean_input in city: 
+                return code
             
         return clean_input.upper()
 
@@ -63,7 +64,7 @@ class SerpApiProvider:
         # 2. Update DB Counter
         try:
             self._increment_api_counter()
-        except:
+        except Exception:
             pass
 
         # 3. Determine Trip Type Logic
@@ -94,15 +95,18 @@ class SerpApiProvider:
                 print(f"❌ SerpApi Error: {results['error']}")
                 return []
 
-            flight_list = []
             sources = []
             
-            if 'best_flights' in results: sources.extend(results['best_flights'])
-            if 'other_flights' in results: sources.extend(results['other_flights'])
+            if 'best_flights' in results: 
+                sources.extend(results['best_flights'])
+            if 'other_flights' in results: 
+                sources.extend(results['other_flights'])
 
             if not sources:
                 print("⚠️ Success but 0 flights found.")
                 return []
+
+            flight_list = []
 
             for flight in sources:
                 try:
@@ -118,6 +122,17 @@ class SerpApiProvider:
                     hours = duration_min // 60
                     mins = duration_min % 60
                     
+                    outbound_time = self._extract_time_from_legs(flight.get("flights", []))
+                    return_time = None
+
+                    if return_date:
+                        return_time = self._fetch_return_time(
+                            departure_token=flight.get("departure_token"),
+                            origin_code=origin_code,
+                            dest_code=dest_code,
+                            depart_date=depart_date,
+                            return_date=return_date
+                        )
                     # GET DIRECT AIRLINE LINK
                     booking_link = get_airline_link(airline_name)
 
@@ -127,11 +142,13 @@ class SerpApiProvider:
                         'price': flight.get('price', 0),
                         'stops': len(flight.get('layovers', [])),
                         'duration': f"{hours}h {mins}m",
-                        'time': self._extract_time(flight), # <--- UPDATED LOGIC USED HERE
+                        'time': outbound_time,
+                        'return_time': return_time,
                         'deep_link': booking_link,
                         'type': 'Round Trip' if return_date else 'One Way'
                     })
-                except:
+                except Exception as e:
+                    print(f"⚠️ Skipping flight due to parsing issue: {e}")
                     continue
 
             return flight_list
@@ -140,6 +157,66 @@ class SerpApiProvider:
             print(f"❌ Critical Failure: {e}")
             return []
 
+    def _fetch_return_time(self, departure_token, origin_code, dest_code, depart_date, return_date):
+        """Fetch return-leg options for a selected outbound itinerary."""
+        if not departure_token:
+            return None
+
+        try:
+            params = {
+                "engine": "google_flights",
+                "departure_id": origin_code,
+                "arrival_id": dest_code,
+                "outbound_date": depart_date,
+                "return_date": return_date,
+                "currency": "USD",
+                "hl": "en",
+                "api_key": self.api_key,
+                "type": "1",
+                "departure_token": departure_token
+            }
+
+            search = serpapi.GoogleSearch(params)
+            result = search.get_dict()
+
+            return_sources = []
+            if "best_flights" in result:
+                return_sources.extend(result["best_flights"])
+            if "other_flights" in result:
+                return_sources.extend(result["other_flights"])
+
+            if not return_sources:
+                return None
+
+            first_return = return_sources[0]
+            return self._extract_time_from_legs(first_return.get("flights", []))
+
+        except Exception as e:
+            print(f"⚠️ Could not fetch return flight times: {e}")
+            return None
+
+    def _extract_time_from_legs(self, legs):
+        try:
+            if not legs:
+                return "See Details"
+
+            dep_full = legs[0].get('departure_airport', {}).get('time', '')
+            arr_full = legs[-1].get('arrival_airport', {}).get('time', '')
+
+            if not dep_full:
+                dep_full = legs[0].get('departure_token', '')
+            if not arr_full:
+                arr_full = legs[-1].get('arrival_token', '')
+
+            dep_time = dep_full.split(' ')[-1] if ' ' in dep_full else dep_full
+            arr_time = arr_full.split(' ')[-1] if ' ' in arr_full else arr_full
+
+            if dep_time and arr_time:
+                return f"{dep_time} - {arr_time}"
+
+            return "See Details"
+        except Exception:
+            return "See Details"
     def _increment_api_counter(self):
         db = get_db()
         cursor = db.cursor()
@@ -152,30 +229,4 @@ class SerpApiProvider:
         """)
         db.commit()
 
-    def _extract_time(self, flight):
-        """
-        Improved extraction: looks for 'departure_airport' -> 'time' first.
-        """
-        try:
-            legs = flight.get('flights', [])
-            if not legs: return "N/A"
-            
-            # Method 1: Look inside airport objects (Standard SerpApi format)
-            # The format is usually "2026-02-02 10:00"
-            dep_full = legs[0].get('departure_airport', {}).get('time', '')
-            arr_full = legs[-1].get('arrival_airport', {}).get('time', '')
-            
-            # Method 2: Fallback to tokens if airport time is missing
-            if not dep_full: dep_full = legs[0].get('departure_token', '')
-            if not arr_full: arr_full = legs[-1].get('arrival_token', '')
-            
-            # Extract just the time part (HH:MM)
-            dep_time = dep_full.split(' ')[-1] if ' ' in dep_full else dep_full
-            arr_time = arr_full.split(' ')[-1] if ' ' in arr_full else arr_full
-            
-            if dep_time and arr_time:
-                return f"{dep_time} - {arr_time}"
-                
-            return "See Details"
-        except:
-            return "See Details"
+    
