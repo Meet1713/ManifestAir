@@ -65,11 +65,13 @@ h1, h2, h3, h4, h5, h6 {
 
 /* --- FIX: INPUT FIELDS (WHITE BOX BUG) --- */
 .neo-input {
+    width: 100%;
+    display: block;
     background-color: var(--surface-dark) !important;
-    border: none !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
     border-radius: 12px;
     color: #fff !important;
-    padding: 15px;
+    padding: 15px 16px;
     font-family: 'Outfit', sans-serif; /* Ensure inputs use new font */
     box-shadow: 
         inset 5px 5px 10px var(--shadow-dark), 
@@ -80,14 +82,17 @@ h1, h2, h3, h4, h5, h6 {
 .neo-input:focus {
     outline: none;
     box-shadow: 
-        inset 2px 2px 5px var(--shadow-dark), 
-        inset -2px -2px 5px var(--shadow-light),
-        0 0 15px rgba(13, 202, 240, 0.2);
-    border-left: 2px solid var(--primary-cyan);
+        inset 1px 1px 3px var(--shadow-dark), 
+        inset -1px -1px 3px var(--shadow-light),
+        0 0 12px rgba(13, 202, 240, 0.2);
+    border-left: 1px solid var(--primary-cyan) !important;
     background-color: var(--surface-dark) !important;
     color: #fff !important;
 }
 
+.neo-input::placeholder {
+    color: rgba(255, 255, 255, 0.45);
+}
 /* HACK: Stops Chrome Autofill from turning inputs white */
 input:-webkit-autofill,
 input:-webkit-autofill:hover, 
