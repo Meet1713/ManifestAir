@@ -22,11 +22,19 @@ def get_usd_to_cad_rate():
     api_key = current_app.config['CURRENCY_API_KEY']
     if not api_key:
         print("Warning: CURRENCY_API_KEY not found. Using fallback.")
-        return 1.40
+        return _RATE_CACHE["rate"] or 1.40
 
     try:
-        url = f"https://api.currencyapi.com/v3/latest?apikey={api_key}&base_currency=USD&currencies=CAD"
-        response = requests.get(url, timeout=5)
+        response = requests.get(
+            "https://api.currencyapi.com/v3/latest",
+            params={
+                "apikey": api_key,
+                "base_currency": "USD",
+                "currencies": "CAD"
+            },
+            timeout=5
+        )
+        response.raise_for_status()
         data = response.json()
         
         # Extract rate
@@ -41,7 +49,7 @@ def get_usd_to_cad_rate():
     except Exception as e:
         print(f"❌ Currency API Error: {e}")
         # Return fallback if API fails (e.g. quota exceeded) to prevent app crash
-        return 1.40 
+        return _RATE_CACHE["rate"] or 1.40 
 
 def to_cad(usd_amount):
     """Converts a USD amount to CAD using the current rate."""
