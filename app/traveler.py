@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for,
 from app.auth import login_required
 from app.db import get_db
 from app.patterns.factory import ProviderFactory
+from app.currency import get_usd_to_cad_rate
 
 bp = Blueprint("traveler", __name__, url_prefix="/traveler")
 
@@ -53,8 +54,9 @@ def search():
         for flight in results:
             usd_price = float(flight["price"])
             flight["usd_price"] = round(usd_price, 2)
-            flight["cad_price"] = round(usd_price * usd_to_cad_rate, 2)
-
+            
+        flight["cad_price"] = round(usd_price * usd_to_cad_rate, 2)
+    
     return render_template('traveler/search.html', 
                            results=results, 
                            origin=origin, 
