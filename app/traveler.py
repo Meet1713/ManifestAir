@@ -54,8 +54,7 @@ def search():
         for flight in results:
             usd_price = float(flight["price"])
             flight["usd_price"] = round(usd_price, 2)
-            
-        flight["cad_price"] = round(usd_price * usd_to_cad_rate, 2)
+            flight["cad_price"] = round(usd_price * usd_to_cad_rate, 2)
     
     return render_template('traveler/search.html', 
                            results=results, 
