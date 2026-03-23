@@ -71,10 +71,27 @@
                     <div>
                         <h5 class="mb-0 fw-bold">{{ flight.provider }}</h5>
                         <small class="text-muted">{{ flight.type }}</small>
+
+                        {% if flight.is_mixed_itinerary %}
+                            <small class="text-info d-block mt-1">Mixed itinerary</small>
+                            <small class="text-muted d-block">Carriers: {{ flight.all_airlines_text }}</small>
+                        {% else %}
+                            <small class="text-muted d-block mt-1">Carrier: {{ flight.primary_airline }}</small>
+                        {% endif %}
+
+                        <small class="d-block mt-1 {% if flight.book_with_is_airline %}text-success{% else %}text-warning{% endif %}">
+                            Book with: {{ flight.book_with }}
+                        </small>
+
+                        {% if flight.booking_option_title %}
+                            <small class="text-muted d-block">
+                                Fare: {{ flight.booking_option_title }}
+                            </small>
+                        {% endif %}
                     </div>
                 </div>
 
-                <div class="col-md-5 text-center">
+                <div class="col-md-4 text-center">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="text-start">
                             <span class="h5 mb-0">{{ origin }}</span>
@@ -88,10 +105,12 @@
                                 {{ 'Direct' if flight.stops == 0 else flight.stops ~ ' Stop(s)' }}
                             </small>
                         </div>
+
                         <div class="text-end">
                             <span class="h5 mb-0">{{ destination }}</span>
                         </div>
                     </div>
+
                     <div class="mt-2">
                         <small class="text-muted d-block">
                             <i class="far fa-clock me-1"></i>
@@ -105,6 +124,14 @@
                         </small>
                         {% endif %}
                     </div>
+
+                    {% if flight.booking_extensions %}
+                    <div class="mt-2">
+                        <small class="text-muted d-block">
+                            {{ flight.booking_extensions[0] }}
+                        </small>
+                    </div>
+                    {% endif %}
                 </div>
 
                 <div class="col-md-4 text-end">
@@ -113,6 +140,16 @@
                         data-cad="{{ flight.cad_price }}">
                         ${{ "%.2f"|format(flight.usd_price) }}
                     </h3>
+
+                    {% if flight.booking_link_ready %}
+                        <small class="text-success d-block mb-2">
+                            Opens selected booking option
+                        </small>
+                    {% else %}
+                        <small class="text-muted d-block mb-2">
+                            Falls back to Google Flights results
+                        </small>
+                    {% endif %}
 
                     <div class="d-flex justify-content-end gap-2">
                         <form action="{{ url_for('traveler.watch_route') }}" method="post">
@@ -125,7 +162,7 @@
                         </form>
                         
                         <a href="{{ flight.deep_link }}" target="_blank" class="btn btn-primary btn-sm px-4">
-                            Select <i class="fas fa-arrow-right ms-1"></i>
+                            {{ flight.link_label }} <i class="fas fa-arrow-right ms-1"></i>
                         </a>
                     </div>
                 </div>
