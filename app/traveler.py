@@ -102,6 +102,7 @@ def notifications():
     cursor.execute("SELECT * FROM notifications WHERE user_id = %s ORDER BY created_at DESC", (g.user['id'],))
     notifs = cursor.fetchall()
     
+    
     # Mark as read immediately when viewed
     cursor.execute("UPDATE notifications SET is_read = TRUE WHERE user_id = %s", (g.user['id'],))
     
