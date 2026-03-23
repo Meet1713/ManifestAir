@@ -2,7 +2,7 @@ import os
 import serpapi
 from app.db import get_db
 from app.airport_service import AirportDatabase
-# from app.airline_links import get_airline_link
+from app.airline_links import get_airline_link
 
 # Initialize airport database
 airport_db = AirportDatabase()
@@ -154,13 +154,13 @@ class SerpApiProvider:
         into a browser-ready direct link, we fall back to the Google Flights URL.
         """
         default_payload = {
-            "book_with": "Google Flights",
-            "book_with_is_airline": False,
+            "book_with": primary_airline,
+            "book_with_is_airline": True,
             "booking_option_title": "",
             "booking_extensions": [],
-            "deep_link": google_flights_url or "#",
-            "link_label": "View on Google Flights",
-            "booking_link_ready": False,
+            "deep_link": get_airline_link(primary_airline),
+            "link_label": "Book on" + primary_airline,
+            "booking_link_ready": True,
         }
 
         if not self.enrich_booking or not booking_token:
@@ -331,13 +331,13 @@ class SerpApiProvider:
                         )
 
                     booking_payload = {
-                        "book_with": "Google Flights",
-                        "book_with_is_airline": False,
+                        "book_with": primary_airline,
+                        "book_with_is_airline": True,
                         "booking_option_title": "",
                         "booking_extensions": [],
-                        "deep_link": google_flights_url if google_flights_url else "#",
-                        "link_label": "View on Google Flights",
-                        "booking_link_ready": False,
+                        "deep_link": get_airline_link(primary_airline),
+                        "link_label": "Book on" + primary_airline,
+                        "booking_link_ready": True,
                     }
 
                     # Limit extra booking-option calls to control API usage
