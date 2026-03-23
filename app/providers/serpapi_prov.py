@@ -287,7 +287,8 @@ class SerpApiProvider:
         except Exception:
             pass
 
-        params = self._build_base_params(origin_code, dest_code, depart_date, return_date)
+       params = self._build_base_params(origin_code, dest_code, depart_date, return_date)
+   
 
         try:
             search = serpapi.GoogleSearch(params)
