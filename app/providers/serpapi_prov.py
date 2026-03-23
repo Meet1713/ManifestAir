@@ -2,7 +2,7 @@ import os
 import serpapi
 from app.db import get_db
 from app.airport_service import AirportDatabase
-from app.airline_links import get_airline_link """add"""
+
 # Initialize airport database
 airport_db = AirportDatabase()
 
@@ -304,24 +304,8 @@ class SerpApiProvider:
         except Exception:
             pass
 
-       """ params = self._build_base_params(origin_code, dest_code, depart_date, return_date)"""
-    params = {
-    "engine": "google_flights",
-    "departure_id": origin_code,
-    "arrival_id": dest_code,
-    "outbound_date": depart_date,
-    "currency": "USD",
-    "hl": "en",
-    "api_key": self.api_key,
-    "type": "1" if return_date else "2",
-}
-if return_date:
-    params["return_date"] = return_date
-if self.deep_search:
-    params["deep_search"] = "true"
-if self.force_fresh:
-    params["no_cache"] = "true"
-
+       params = self._build_base_params(origin_code, dest_code, depart_date, return_date)
+   
 
         try:
             search = serpapi.GoogleSearch(params)
@@ -339,7 +323,7 @@ if self.force_fresh:
             if not sources:
                 print("⚠️ Success but 0 flights found.")
                 return []
-flight_list = []     """added"""
+
             for flight in sources:
                 try:
                     airline_name = "Unknown Airline"
