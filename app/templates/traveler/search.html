@@ -93,13 +93,25 @@
                         </div>
                     </div>
                     <div class="mt-2">
-                        <small class="text-muted"><i class="far fa-clock me-1"></i> {{ flight.time }}</small>
+                        <small class="text-muted d-block">
+                            <i class="far fa-clock me-1"></i>
+                            Depart: {{ flight.time }}
+                        </small>
+
+                        {% if flight.return_time %}
+                        <small class="text-muted d-block">
+                            <i class="fas fa-rotate-left me-1"></i>
+                            Return: {{ flight.return_time }}
+                        </small>
+                        {% endif %}
                     </div>
                 </div>
 
                 <div class="col-md-4 text-end">
-                    <h3 class="fw-bold text-success mb-2 price-display" data-usd="{{ flight.price }}">
-                        ${{ flight.price }}
+                    <h3 class="fw-bold text-success mb-2 price-display"
+                        data-usd="{{ flight.usd_price }}"
+                        data-cad="{{ flight.cad_price }}">
+                        ${{ "%.2f"|format(flight.usd_price) }}
                     </h3>
 
                     <div class="d-flex justify-content-end gap-2">
@@ -131,7 +143,7 @@
     {% endif %}
 </div>
 
-<div id="exchange-rate-data" data-rate="{{ current_rate }}"></div>
+<!--<div id="exchange-rate-data" data-rate="{{ current_rate }}"></div>-->
 
 <script>
     // 1. Logic for Return Date toggle
@@ -144,20 +156,20 @@
     // 2. Logic for Currency Conversion
     document.getElementById('currencyToggle')?.addEventListener('change', function() {
         const isCAD = this.checked;
-        const rate = parseFloat(document.getElementById('exchange-rate-data').dataset.rate);
+        //const rate = parseFloat(document.getElementById('exchange-rate-data').dataset.rate);
         const prices = document.querySelectorAll('.price-display');
 
         prices.forEach(el => {
             const usdPrice = parseFloat(el.dataset.usd);
+            const cadPrice = parseFloat(el.dataset.cad);
+
             if (isCAD) {
-                // Convert to CAD
-                const cadPrice = (usdPrice * rate).toFixed(2);
-                el.innerText = "C$" + cadPrice;
+                el.innerText = "C$" + cadPrice.toFixed(2);
                 el.classList.remove('text-success');
                 el.classList.add('text-info'); // Change color to indicate change
             } else {
                 // Revert to USD
-                el.innerText = "$" + usdPrice;
+                el.innerText = "$" + usdPrice.toFixed(2);
                 el.classList.add('text-success');
                 el.classList.remove('text-info');
             }

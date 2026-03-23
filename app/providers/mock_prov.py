@@ -6,7 +6,6 @@ class MockProvider(FlightProvider):
     A robust mock provider that generates realistic flight data 
     with working logos and prices.
     """
-    # FIX: Added 'return_date=None' to accept the 4th argument and prevent the crash
     def search_flights(self, origin, destination, date, return_date=None):
         
         print(f"🧪 MOCK SEARCH: {origin} -> {destination} | Return: {return_date}")
@@ -36,8 +35,15 @@ class MockProvider(FlightProvider):
             dep_min = random.choice(["00", "15", "30", "45"])
             arr_min = random.choice(["00", "15", "30", "45"])
             
-            time_str = f"{dep_h:02}:{dep_min} - {arr_h:02}:{arr_min}"
+            outbound_time = f"{dep_h:02}:{dep_min} - {arr_h:02}:{arr_min}"
             
+            return_time = None
+            if return_date:
+                r_dep_h = random.randint(6, 22)
+                r_arr_h = (r_dep_h + random.randint(3, 12)) % 24
+                r_dep_min = random.choice(["00", "15", "30", "45"])
+                r_arr_min = random.choice(["00", "15", "30", "45"])
+                return_time = f"{r_dep_h:02}:{r_dep_min} - {r_arr_h:02}:{r_arr_min}"
             # Build the flight object
             flight = {
                 'provider': airline_name,
@@ -45,7 +51,8 @@ class MockProvider(FlightProvider):
                 'price': price,
                 'stops': random.choice([0, 1]), 
                 'duration': f"{random.randint(5, 14)}h {random.randint(10, 50)}m",
-                'time': time_str,
+                'time': outbound_time,
+                'return_time': return_time,
                 'type': 'Round Trip' if return_date else 'One Way',
                 'deep_link': "#" 
             }

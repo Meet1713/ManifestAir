@@ -10,17 +10,16 @@ ESSENTIAL_CITY_MAPPINGS = {
     "new york": "JFK", "london": "LHR", "tokyo": "HND", "paris": "CDG",
     "dubai": "DXB", "singapore": "SIN", "bangkok": "BKK", "hong kong": "HKG",
     "seoul": "ICN", "miami": "MIA", "los angeles": "LAX", "chicago": "ORD",
-    "toronto": "YYZ", "regina": "YQR", "vancouver": "YVR", "ahmedabad": "AMD",
-    "sydney": "SYD", "mumbai": "BOM", "delhi": "DEL", "shanghai": "PVG",
-    "beijing": "PEK", "moscow": "SVO", "istanbul": "IST", "amsterdam": "AMS",
-    "frankfurt": "FRA", "madrid": "MAD", "rome": "FCO", "barcelona": "BCN",
-    "milan": "MXP", "munich": "MUC", "zurich": "ZRH", "vienna": "VIE",
-    "prague": "PRG", "warsaw": "WAW", "budapest": "BUD", "athens": "ATH",
-    "lisbon": "LIS", "brussels": "BRU", "copenhagen": "CPH", "stockholm": "ARN",
-    "oslo": "OSL", "helsinki": "HEL", "dublin": "DUB", "manchester": "MAN",
-    "edinburgh": "EDI", "birmingham": "BHX", "glasgow": "GLA", "bristol": "BRS",
-    "liverpool": "LPL", "newcastle": "NCL", "leeds": "LBA", "nottingham": "EMA",
-    "sheffield": "DSA", "nairobi": "NBO"
+    "toronto": "YYZ", "sydney": "SYD", "mumbai": "BOM", "delhi": "DEL",
+    "shanghai": "PVG", "beijing": "PEK", "moscow": "SVO", "istanbul": "IST",
+    "amsterdam": "AMS", "frankfurt": "FRA", "madrid": "MAD", "rome": "FCO",
+    "barcelona": "BCN", "milan": "MXP", "munich": "MUC", "zurich": "ZRH",
+    "vienna": "VIE", "prague": "PRG", "warsaw": "WAW", "budapest": "BUD",
+    "athens": "ATH", "lisbon": "LIS", "brussels": "BRU", "copenhagen": "CPH",
+    "stockholm": "ARN", "oslo": "OSL", "helsinki": "HEL", "dublin": "DUB",
+    "manchester": "MAN", "edinburgh": "EDI", "birmingham": "BHX", "glasgow": "GLA",
+    "bristol": "BRS", "liverpool": "LPL", "newcastle": "NCL", "leeds": "LBA",
+    "nottingham": "EMA", "sheffield": "DSA", "nairobi": "NBO"
 }
 
 
@@ -63,13 +62,31 @@ class SerpApiProvider:
                 return db_code
 
         for city, code in ESSENTIAL_CITY_MAPPINGS.items():
-            if clean_input in city:
-                return code
-
+            if clean_input in city: return code
+            
         return clean_input.upper()
 
-    def _build_base_params(self, origin_code, dest_code, depart_date, return_date=None):
-        """Common parameters for Google Flights search."""
+    def search_flights(self, origin, destination, depart_date, return_date=None):
+        if not self.api_key:
+            print("❌ Error: SERPAPI_KEY not found.")
+            return []
+
+        # 1. Resolve Locations
+        origin_code = self._resolve_code(origin)
+        dest_code = self._resolve_code(destination)
+        print(f"✈️ Live Search: {origin} ({origin_code}) -> {destination} ({dest_code})")
+
+        # 2. Update DB Counter
+        try:
+            self._increment_api_counter()
+        except:
+            pass
+
+        # 3. Determine Trip Type Logic
+        # Google Flights Type: 1 = Round Trip, 2 = One Way
+        flight_type = "1" if return_date else "2"
+
+        # 4. Parameters
         params = {
             "engine": "google_flights",
             "departure_id": origin_code,
@@ -298,79 +315,40 @@ class SerpApiProvider:
                 return []
 
             sources = []
-            if "best_flights" in results:
-                sources.extend(results["best_flights"])
-            if "other_flights" in results:
-                sources.extend(results["other_flights"])
+            
+            if 'best_flights' in results: sources.extend(results['best_flights'])
+            if 'other_flights' in results: sources.extend(results['other_flights'])
 
             if not sources:
                 print("⚠️ Success but 0 flights found.")
                 return []
 
-            google_flights_url = results.get("search_metadata", {}).get("google_flights_url", "")
-
-            flight_list = []
-
-            for idx, flight in enumerate(sources):
+            for flight in sources:
                 try:
-                    airlines = self._extract_airlines(flight)
-                    provider_label = self._build_provider_label(airlines)
-                    primary_airline = airlines[0] if airlines else "Unknown Airline"
+                    airline_name = "Unknown Airline"
+                    airline_logo = "https://via.placeholder.com/32"
+                    
+                    if 'flights' in flight and len(flight['flights']) > 0:
+                        first_leg = flight['flights'][0]
+                        airline_name = first_leg.get('airline', airline_name)
+                        airline_logo = first_leg.get('airline_logo', airline_logo)
 
                     duration_min = flight.get("total_duration", 0)
                     hours = duration_min // 60
                     mins = duration_min % 60
-
-                    outbound_time = self._extract_time_from_legs(flight.get("flights", []))
-                    return_time = None
-
-                    if return_date:
-                        return_time = self._fetch_return_time(
-                            departure_token=flight.get("departure_token"),
-                            origin_code=origin_code,
-                            dest_code=dest_code,
-                            depart_date=depart_date,
-                            return_date=return_date,
-                        )
-
-                    booking_payload = {
-                        "book_with": "Google Flights",
-                        "book_with_is_airline": False,
-                        "booking_option_title": "",
-                        "booking_extensions": [],
-                        "deep_link": google_flights_url if google_flights_url else "#",
-                        "link_label": "View on Google Flights",
-                        "booking_link_ready": False,
-                    }
-
-                    # Limit extra booking-option calls to control API usage
-                    if idx < self.booking_details_limit:
-                        booking_payload = self._fetch_booking_details(
-                            booking_token=flight.get("booking_token"),
-                            google_flights_url=google_flights_url,
-                            primary_airline=primary_airline,
-                        )
+                    
+                    # GET DIRECT AIRLINE LINK
+                    booking_link = get_airline_link(airline_name)
 
                     flight_list.append({
-                        "provider": provider_label,
-                        "primary_airline": primary_airline,
-                        "all_airlines": airlines,
-                        "all_airlines_text": ", ".join(airlines) if airlines else "Unknown",
-                        "is_mixed_itinerary": len(airlines) > 1,
-                        "logo": self._choose_logo(flight),
-                        "price": float(flight.get("price", 0) or 0),
-                        "stops": len(flight.get("layovers", [])),
-                        "duration": f"{hours}h {mins}m",
-                        "time": outbound_time,
-                        "return_time": return_time,
-                        "type": "Round Trip" if return_date else "One Way",
-                        "deep_link": booking_payload["deep_link"],
-                        "link_label": booking_payload["link_label"],
-                        "booking_link_ready": booking_payload["booking_link_ready"],
-                        "book_with": booking_payload["book_with"],
-                        "book_with_is_airline": booking_payload["book_with_is_airline"],
-                        "booking_option_title": booking_payload["booking_option_title"],
-                        "booking_extensions": booking_payload["booking_extensions"],
+                        'provider': airline_name,
+                        'logo': airline_logo,
+                        'price': flight.get('price', 0),
+                        'stops': len(flight.get('layovers', [])),
+                        'duration': f"{hours}h {mins}m",
+                        'time': self._extract_time(flight), # <--- UPDATED LOGIC USED HERE
+                        'deep_link': booking_link,
+                        'type': 'Round Trip' if return_date else 'One Way'
                     })
                 except Exception as e:
                     print(f"⚠️ Skipping flight due to parsing issue: {e}")
@@ -382,6 +360,66 @@ class SerpApiProvider:
             print(f"❌ Critical Failure: {e}")
             return []
 
+    def _fetch_return_time(self, departure_token, origin_code, dest_code, depart_date, return_date):
+        """Fetch return-leg options for a selected outbound itinerary."""
+        if not departure_token:
+            return None
+
+        try:
+            params = {
+                "engine": "google_flights",
+                "departure_id": origin_code,
+                "arrival_id": dest_code,
+                "outbound_date": depart_date,
+                "return_date": return_date,
+                "currency": "USD",
+                "hl": "en",
+                "api_key": self.api_key,
+                "type": "1",
+                "departure_token": departure_token
+            }
+
+            search = serpapi.GoogleSearch(params)
+            result = search.get_dict()
+
+            return_sources = []
+            if "best_flights" in result:
+                return_sources.extend(result["best_flights"])
+            if "other_flights" in result:
+                return_sources.extend(result["other_flights"])
+
+            if not return_sources:
+                return None
+
+            first_return = return_sources[0]
+            return self._extract_time_from_legs(first_return.get("flights", []))
+
+        except Exception as e:
+            print(f"⚠️ Could not fetch return flight times: {e}")
+            return None
+
+    def _extract_time_from_legs(self, legs):
+        try:
+            if not legs:
+                return "See Details"
+
+            dep_full = legs[0].get('departure_airport', {}).get('time', '')
+            arr_full = legs[-1].get('arrival_airport', {}).get('time', '')
+
+            if not dep_full:
+                dep_full = legs[0].get('departure_token', '')
+            if not arr_full:
+                arr_full = legs[-1].get('arrival_token', '')
+
+            dep_time = dep_full.split(' ')[-1] if ' ' in dep_full else dep_full
+            arr_time = arr_full.split(' ')[-1] if ' ' in arr_full else arr_full
+
+            if dep_time and arr_time:
+                return f"{dep_time} - {arr_time}"
+
+            return "See Details"
+        except Exception:
+            return "See Details"
     def _increment_api_counter(self):
         db = get_db()
         cursor = db.cursor()
@@ -393,3 +431,31 @@ class SerpApiProvider:
             last_updated = CURRENT_DATE
         """)
         db.commit()
+
+    def _extract_time(self, flight):
+        """
+        Improved extraction: looks for 'departure_airport' -> 'time' first.
+        """
+        try:
+            legs = flight.get('flights', [])
+            if not legs: return "N/A"
+            
+            # Method 1: Look inside airport objects (Standard SerpApi format)
+            # The format is usually "2026-02-02 10:00"
+            dep_full = legs[0].get('departure_airport', {}).get('time', '')
+            arr_full = legs[-1].get('arrival_airport', {}).get('time', '')
+            
+            # Method 2: Fallback to tokens if airport time is missing
+            if not dep_full: dep_full = legs[0].get('departure_token', '')
+            if not arr_full: arr_full = legs[-1].get('arrival_token', '')
+            
+            # Extract just the time part (HH:MM)
+            dep_time = dep_full.split(' ')[-1] if ' ' in dep_full else dep_full
+            arr_time = arr_full.split(' ')[-1] if ' ' in arr_full else arr_full
+            
+            if dep_time and arr_time:
+                return f"{dep_time} - {arr_time}"
+                
+            return "See Details"
+        except:
+            return "See Details"
