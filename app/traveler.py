@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, g, session
+from flask import Blueprint, render_template, request, flash, redirect, url_for, g
 from app.auth import login_required
 from app.db import get_db
 from app.patterns.factory import ProviderFactory
@@ -28,14 +28,15 @@ def search():
     destination = ""
     depart_date = ""
     return_date = ""
-    trip_type = "one_way" # Default
+    trip_type = "one_way"
+    current_rate = get_usd_to_cad_rate()
 
     if request.method == 'POST':
-        origin = request.form.get('origin')
-        destination = request.form.get('destination')
+        origin = request.form.get('origin','').strip()
+        destination = request.form.get('destination', '').strip()
         depart_date = request.form.get('date')
         return_date = request.form.get('return_date')
-        trip_type = request.form.get('trip_type')
+        trip_type = request.form.get('trip_type','one_way')
         
         # If One Way selected, clear the return date so the Provider knows logic to use
         if trip_type == 'one_way':
@@ -48,13 +49,13 @@ def search():
         # The new serpapi_prov.py is expecting these 4 arguments now
         results = provider.search_flights(origin, destination, depart_date, return_date)
         
-        usd_to_cad_rate = get_usd_to_cad_rate()
-        print(f"🔁 Using USD->CAD rate: {usd_to_cad_rate}")
+        # usd_to_cad_rate = get_usd_to_cad_rate()
+        # print(f"🔁 Using USD->CAD rate: {usd_to_cad_rate}")
 
         for flight in results:
-            usd_price = float(flight["price"])
+            usd_price = float(flight.get("price", 0) or 0)
             flight["usd_price"] = round(usd_price, 2)
-            flight["cad_price"] = round(usd_price * usd_to_cad_rate, 2)
+            flight["cad_price"] = round(usd_price * current_rate, 2)
     
     return render_template('traveler/search.html', 
                            results=results, 
@@ -62,7 +63,9 @@ def search():
                            destination=destination, 
                            date=depart_date,
                            return_date=return_date,
-                           trip_type=trip_type)
+                           trip_type=trip_type,
+                           current_rate=current_rate
+                           )
 
 @bp.route('/watch', methods=['POST'])
 def watch_route():
@@ -79,7 +82,7 @@ def watch_route():
         "INSERT INTO watches (user_id, origin, destination, depart_date, threshold_price) VALUES (%s, %s, %s, %s, %s)",
         (g.user['id'], origin, destination, depart_date, price)
     )
-    flash(f"Now watching {origin} -> {destination} for price drops below ${price}")
+    flash(f"Now watching {origin} -> {destination} for price drops below ${price:.2f}")
     return redirect(url_for('traveler.dashboard'))
 
 @bp.route('/delete_watch/<int:id>', methods=['POST'])
