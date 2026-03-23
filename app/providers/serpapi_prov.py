@@ -25,7 +25,7 @@ ESSENTIAL_CITY_MAPPINGS = {
 }
 
 class SerpApiProvider:
-    def _init_(self):
+    def __init__(self):
         self.api_key = os.environ.get('SERPAPI_KEY')
 
          # Better matching with Google Flights browser results
