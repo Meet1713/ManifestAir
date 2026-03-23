@@ -7,66 +7,62 @@ from app.airline_links import get_airline_link
 # Initialize airport database
 airport_db = AirportDatabase()
 
+# Keep essential mappings for speed
 ESSENTIAL_CITY_MAPPINGS = {
     "new york": "JFK", "london": "LHR", "tokyo": "HND", "paris": "CDG",
     "dubai": "DXB", "singapore": "SIN", "bangkok": "BKK", "hong kong": "HKG",
     "seoul": "ICN", "miami": "MIA", "los angeles": "LAX", "chicago": "ORD",
-    "toronto": "YYZ", "regina": "YQR", "vancouver": "YVR", "ahmedabad": "AMD",
-    "sydney": "SYD", "mumbai": "BOM", "delhi": "DEL", "shanghai": "PVG",
-    "beijing": "PEK", "moscow": "SVO", "istanbul": "IST", "amsterdam": "AMS",
-    "frankfurt": "FRA", "madrid": "MAD", "rome": "FCO", "barcelona": "BCN",
-    "milan": "MXP", "munich": "MUC", "zurich": "ZRH", "vienna": "VIE",
-    "prague": "PRG", "warsaw": "WAW", "budapest": "BUD", "athens": "ATH",
-    "lisbon": "LIS", "brussels": "BRU", "copenhagen": "CPH", "stockholm": "ARN",
-    "oslo": "OSL", "helsinki": "HEL", "dublin": "DUB", "manchester": "MAN",
-    "edinburgh": "EDI", "birmingham": "BHX", "glasgow": "GLA", "bristol": "BRS",
-    "liverpool": "LPL", "newcastle": "NCL", "leeds": "LBA", "nottingham": "EMA",
-    "sheffield": "DSA", "nairobi": "NBO"
+    "toronto": "YYZ", "regina": "YQR", "vancouver": "YVR", "ahmedabad": "AMD", "sydney": "SYD", "mumbai": "BOM", "delhi": "DEL",
+    "shanghai": "PVG", "beijing": "PEK", "moscow": "SVO", "istanbul": "IST",
+    "amsterdam": "AMS", "frankfurt": "FRA", "madrid": "MAD", "rome": "FCO",
+    "barcelona": "BCN", "milan": "MXP", "munich": "MUC", "zurich": "ZRH",
+    "vienna": "VIE", "prague": "PRG", "warsaw": "WAW", "budapest": "BUD",
+    "athens": "ATH", "lisbon": "LIS", "brussels": "BRU", "copenhagen": "CPH",
+    "stockholm": "ARN", "oslo": "OSL", "helsinki": "HEL", "dublin": "DUB",
+    "manchester": "MAN", "edinburgh": "EDI", "birmingham": "BHX", "glasgow": "GLA",
+    "bristol": "BRS", "liverpool": "LPL", "newcastle": "NCL", "leeds": "LBA",
+    "nottingham": "EMA", "sheffield": "DSA", "nairobi": "NBO"
 }
 
-
 class SerpApiProvider:
-    def __init__(self):
-        self.api_key = os.environ.get("SERPAPI_KEY")
+    def _init_(self):
+        self.api_key = os.environ.get('SERPAPI_KEY')
 
-        # Better matching with Google Flights browser results
+         # Better matching with Google Flights browser results
         self.force_fresh = os.environ.get("SERPAPI_FORCE_FRESH", "true").lower() == "true"
         self.deep_search = os.environ.get("SERPAPI_DEEP_SEARCH", "true").lower() == "true"
 
         # Booking-option enrichment
         self.enrich_booking = os.environ.get("SERPAPI_ENRICH_BOOKING", "true").lower() == "true"
         self.booking_details_limit = int(os.environ.get("SERPAPI_BOOKING_DETAILS_LIMIT", "5"))
-
+        
     def _resolve_code(self, user_input):
-        """Resolve a city/airport input into a likely IATA airport code."""
+        """Smart resolution: tries multiple strategies to find airport code"""
         if not user_input:
             return ""
 
         clean_input = user_input.lower().strip()
-
-        if clean_input in ESSENTIAL_CITY_MAPPINGS:
+        
+        if clean_input in ESSENTIAL_CITY_MAPPINGS: 
             return ESSENTIAL_CITY_MAPPINGS[clean_input]
-
-        if len(clean_input) == 3 and clean_input.isalpha():
+        if len(clean_input) == 3 and clean_input.isalpha(): 
             return clean_input.upper()
-
+        
         code = airport_db.get_airport_code(clean_input)
-        if code:
-            return code
-
-        if "," in clean_input:
-            city_part = clean_input.split(",")[0].strip()
-            if city_part in ESSENTIAL_CITY_MAPPINGS:
+        if code: return code
+        
+        if ',' in clean_input:
+            city_part = clean_input.split(',')[0].strip()
+            if city_part in ESSENTIAL_CITY_MAPPINGS: 
                 return ESSENTIAL_CITY_MAPPINGS[city_part]
 
             db_code = airport_db.get_airport_code(city_part)
-            if db_code:
-                return db_code
-
+            if db_code: return db_code
+            
         for city, code in ESSENTIAL_CITY_MAPPINGS.items():
-            if clean_input in city:
+            if clean_input in city: 
                 return code
-
+            
         return clean_input.upper()
 
     def _build_base_params(self, origin_code, dest_code, depart_date, return_date=None):
@@ -111,7 +107,7 @@ class SerpApiProvider:
         if legs:
             return legs[0].get("airline_logo", "https://via.placeholder.com/32")
 
-        return "https://via.placeholder.com/32"
+        return "https://via.placeholder.com/32"   
 
     def _build_provider_label(self, airlines):
         """Short airline label for the UI card."""
@@ -119,8 +115,8 @@ class SerpApiProvider:
             return "Unknown Airline"
         if len(airlines) == 1:
             return airlines[0]
-        return f"{airlines[0]} + {len(airlines) - 1} more"
-
+        return f"{airlines[0]} + {len(airlines) - 1} more"  
+        
     def _extract_time_from_legs(self, legs):
         """Return a simple departure-arrival time string."""
         try:
@@ -147,7 +143,7 @@ class SerpApiProvider:
         """
         if isinstance(option, dict) and isinstance(option.get("together"), dict):
             return option["together"]
-        return option if isinstance(option, dict) else {}
+        return option if isinstance(option, dict) else {}     
 
     def _fetch_booking_details(self, booking_token, google_flights_url, primary_airline):
         """
@@ -244,7 +240,7 @@ class SerpApiProvider:
 
         except Exception as e:
             print(f"⚠️ Booking enrichment failed: {e}")
-            return default_payload
+            return default_payload    
 
     def _fetch_return_time(self, departure_token, origin_code, dest_code, depart_date, return_date):
         """Fetch return-leg times for a selected outbound itinerary."""
@@ -272,7 +268,7 @@ class SerpApiProvider:
 
         except Exception as e:
             print(f"⚠️ Could not fetch return flight times: {e}")
-            return None
+            return None           
 
     def search_flights(self, origin, destination, depart_date, return_date=None):
         if not self.api_key:
@@ -288,8 +284,7 @@ class SerpApiProvider:
         except Exception:
             pass
 
-       params = self._build_base_params(origin_code, dest_code, depart_date, return_date)
-   
+        params = self._build_base_params(origin_code, dest_code, depart_date, return_date)
 
         try:
             search = serpapi.GoogleSearch(params)
