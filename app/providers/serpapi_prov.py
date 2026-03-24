@@ -186,6 +186,7 @@ class SerpApiProvider:
 
             chosen = None
             fallback = None
+            ready_fallback = None
 
             for option in options:
                 flat = self._flatten_booking_option(option)
@@ -195,20 +196,25 @@ class SerpApiProvider:
                 if fallback is None:
                     fallback = flat
 
+                booking_request = flat.get("booking_request", {}) or {}
+                request_url = booking_request.get("url", "")
+                post_data = booking_request.get("post_data", "")
+                
+                if request_url and not post_data and ready_fallback is None:
+                    ready_fallback = flat
                 seller = (flat.get("book_with") or "").strip().lower()
                 primary = (primary_airline or "").strip().lower()
 
                 # Prefer seller that matches the primary airline
-                if seller and primary and primary in seller:
+                if seller and primary and primary in seller and request_url and not post_data:
                     chosen = flat
                     break
 
                 # Or any airline-direct option
-                if flat.get("airline") is True:
+                if request_url and not post_data and chosen is None:
                     chosen = flat
-                    break
 
-            chosen = chosen or fallback
+            chosen = chosen or ready_fallback or fallback
             if not chosen:
                 return default_payload
 
