@@ -109,13 +109,7 @@ class SerpApiProvider:
 
         return "https://via.placeholder.com/32"   
 
-   """ def _build_provider_label(self, airlines):
-        hort airline label for the UI card.
-        if not airlines:
-            return "Unknown Airline"
-        if len(airlines) == 1:
-            return airlines[0]
-        return f"{airlines[0]} + {len(airlines) - 1} more"  """
+
     def _build_provider_label(self, airlines, primary_airline=None):
         """Short airline label for the UI card."""
         if not airlines:
@@ -324,19 +318,17 @@ class SerpApiProvider:
 
             for idx, flight in enumerate(sources):
                 try:
-                    """airlines = self._extract_airlines(flight)
-                    provider_label = self._build_provider_label(airlines)
-                    primary_airline = airlines[0] if airlines else "Unknown Airline""""
                     airlines = self._extract_airlines(flight)
 
-                all_legs = flight.get("flights", [])
-                if all_legs:
-                    longest_leg = max(all_legs, key=lambda leg: leg.get("duration", 0))
-                    primary_airline = longest_leg.get("airline") or (airlines[0] if airlines else "Unknown Airline")
-                else:
-                    primary_airline = airlines[0] if airlines else "Unknown Airline"
+                    all_legs = flight.get("flights", [])
+                    if all_legs:
+                        longest_leg = max(all_legs, key=lambda leg: leg.get("duration", 0))
+                        primary_airline = longest_leg.get("airline") or (airlines[0] if airlines else "Unknown Airline")
+                    else:
+                        primary_airline = airlines[0] if airlines else "Unknown Airline"
 
-                provider_label = self._build_provider_label(airlines, primary_airline)
+                    provider_label = self._build_provider_label(airlines, primary_airline)
+
 
                     duration_min = flight.get("total_duration", 0)
                     hours = duration_min // 60
