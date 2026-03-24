@@ -115,14 +115,24 @@
                     </h3>
 
                     <div class="d-flex justify-content-end gap-2">
-                        <form action="{{ url_for('traveler.watch_route') }}" method="post">
+                     <!--   <form action="{{ url_for('traveler.watch_route') }}" method="post">
                             <input type="hidden" name="origin" value="{{ origin }}">
                             <input type="hidden" name="destination" value="{{ destination }}">
                             <input type="hidden" name="price" value="{{ flight.price }}">
                             <button type="submit" class="btn btn-outline-secondary btn-sm" title="Track Price">
                                 <i class="fas fa-bell"></i>
                             </button>
-                        </form>
+                        </form>-->
+                        
+                        <form action="{{ url_for('traveler.watch_route') }}" method="post">
+    <input type="hidden" name="origin" value="{{ origin }}">
+    <input type="hidden" name="destination" value="{{ destination }}">
+    <input type="hidden" name="price" value="{{ flight.price }}">
+    <input type="hidden" name="depart_date" value="{{ date }}">
+    <button type="submit" class="btn btn-outline-secondary btn-sm" title="Track Price">
+        <i class="fas fa-bell"></i>
+    </button>
+</form>
                         
                         <a href="{{ flight.deep_link }}" target="_blank" class="btn btn-primary btn-sm px-4">
                             Book with {{ flight.book_with }}<i class="fas fa-arrow-right ms-1"></i>

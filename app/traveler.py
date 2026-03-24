@@ -69,12 +69,16 @@ def search():
 
 @bp.route('/watch', methods=['POST'])
 def watch_route():
-    origin = request.form['origin']
+    """"origin = request.form['origin']
     destination = request.form['destination']
     price = float(request.form['price'])
     # Default depart date for the watch (simplified for MVP, sets it to 7 days from now)
     import datetime
-    depart_date = datetime.date.today() + datetime.timedelta(days=7)
+    depart_date = datetime.date.today() + datetime.timedelta(days=7)"""
+    origin = request.form['origin']
+    destination = request.form['destination']
+    price = float(request.form['price'])
+    depart_date = request.form.get('depart_date')
     
     db = get_db()
     cursor = db.cursor()
