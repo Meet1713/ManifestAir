@@ -17,7 +17,7 @@ CANADIAN_DESTINATIONS = [
     {
         "city": "Montreal",
         "country": "Canada",
-        "image": "https://images.pexels.com/photos/11252370/pexels-photo-11252370.jpeg?auto=compress&cs=tinysrgb&w=800"
+        "image": "https://upload.wikimedia.org/wikipedia/commons/c/cd/Montreal_Skyline.jpg"
     },
     {
         "city": "Banff",

@@ -95,3 +95,7 @@ VALUES ('New York', 'USA', 450, 'https://images.unsplash.com/photo-1496442226666
 -- Dubai
 INSERT INTO destinations (city, country, price_estimate, image_url) 
 VALUES ('Dubai', 'UAE', 920, 'https://images.unsplash.com/photo-1512453979798-5ea904acfb5a?q=80&w=800&auto=format&fit=crop');
+
+UPDATE destinations
+SET image_url = 'https://upload.wikimedia.org/wikipedia/commons/c/cd/Montreal_Skyline.jpg'
+WHERE city = 'Montreal';
