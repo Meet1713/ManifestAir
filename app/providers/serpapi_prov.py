@@ -98,16 +98,21 @@ class SerpApiProvider:
                 airlines.append(airline)
         return airlines
 
-    def _choose_logo(self, flight):
-        """Pick the best available logo."""
+    def _choose_logo(self, flight, primary_airline=None):
+        """Pick the best available logo — prefer the main long-haul carrier's logo."""
         if flight.get("airline_logo"):
             return flight["airline_logo"]
 
         legs = flight.get("flights", [])
         if legs:
-            return legs[0].get("airline_logo", "https://via.placeholder.com/32")
+            if primary_airline:
+                for leg in legs:
+                    if leg.get("airline") == primary_airline and leg.get("airline_logo"):
+                        return leg["airline_logo"]
+            longest_leg = max(legs, key=lambda leg: leg.get("duration", 0))
+            return longest_leg.get("airline_logo", "https://via.placeholder.com/32")
 
-        return "https://via.placeholder.com/32"   
+        return "https://via.placeholder.com/32" 
 
 
     def _build_provider_label(self, airlines, primary_airline=None):
@@ -370,7 +375,7 @@ class SerpApiProvider:
                         "all_airlines": airlines,
                         "all_airlines_text": ", ".join(airlines) if airlines else "Unknown",
                         "is_mixed_itinerary": len(airlines) > 1,
-                        "logo": self._choose_logo(flight),
+                        "logo": self._choose_logo(flight, primary_airline),
                         "price": float(flight.get("price", 0) or 0),
                         "stops": len(flight.get("layovers", [])),
                         "duration": f"{hours}h {mins}m",
