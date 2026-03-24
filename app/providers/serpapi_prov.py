@@ -109,13 +109,21 @@ class SerpApiProvider:
 
         return "https://via.placeholder.com/32"   
 
-    def _build_provider_label(self, airlines):
+   """ def _build_provider_label(self, airlines):
         """Short airline label for the UI card."""
         if not airlines:
             return "Unknown Airline"
         if len(airlines) == 1:
             return airlines[0]
-        return f"{airlines[0]} + {len(airlines) - 1} more"  
+        return f"{airlines[0]} + {len(airlines) - 1} more"  """
+    def _build_provider_label(self, airlines, primary_airline=None):
+    """Short airline label for the UI card."""
+    if not airlines:
+        return "Unknown Airline"
+    if len(airlines) == 1:
+        return airlines[0]
+    lead = primary_airline if primary_airline else airlines[0]
+    return f"{lead} + {len(airlines) - 1} more"
         
     def _extract_time_from_legs(self, legs):
         """Return a simple departure-arrival time string."""
@@ -316,9 +324,19 @@ class SerpApiProvider:
 
             for idx, flight in enumerate(sources):
                 try:
-                    airlines = self._extract_airlines(flight)
+                    """airlines = self._extract_airlines(flight)
                     provider_label = self._build_provider_label(airlines)
+                    primary_airline = airlines[0] if airlines else "Unknown Airline""""
+                    airlines = self._extract_airlines(flight)
+
+                all_legs = flight.get("flights", [])
+                if all_legs:
+                    longest_leg = max(all_legs, key=lambda leg: leg.get("duration", 0))
+                    primary_airline = longest_leg.get("airline") or (airlines[0] if airlines else "Unknown Airline")
+                else:
                     primary_airline = airlines[0] if airlines else "Unknown Airline"
+
+                provider_label = self._build_provider_label(airlines, primary_airline)
 
                     duration_min = flight.get("total_duration", 0)
                     hours = duration_min // 60
