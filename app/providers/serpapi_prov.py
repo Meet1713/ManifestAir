@@ -110,20 +110,20 @@ class SerpApiProvider:
         return "https://via.placeholder.com/32"   
 
    """ def _build_provider_label(self, airlines):
-        """Short airline label for the UI card."""
+        hort airline label for the UI card.
         if not airlines:
             return "Unknown Airline"
         if len(airlines) == 1:
             return airlines[0]
         return f"{airlines[0]} + {len(airlines) - 1} more"  """
     def _build_provider_label(self, airlines, primary_airline=None):
-    """Short airline label for the UI card."""
-    if not airlines:
-        return "Unknown Airline"
-    if len(airlines) == 1:
-        return airlines[0]
-    lead = primary_airline if primary_airline else airlines[0]
-    return f"{lead} + {len(airlines) - 1} more"
+        """Short airline label for the UI card."""
+        if not airlines:
+            return "Unknown Airline"
+        if len(airlines) == 1:
+            return airlines[0]
+        lead = primary_airline if primary_airline else airlines[0]  
+        return f"{lead} + {len(airlines) - 1} more"
         
     def _extract_time_from_legs(self, legs):
         """Return a simple departure-arrival time string."""
