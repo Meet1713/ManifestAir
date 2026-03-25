@@ -100,17 +100,22 @@ class SerpApiProvider:
 
     def _choose_logo(self, flight, primary_airline=None):
         """Pick the best available logo — prefer the main long-haul carrier's logo."""
-        if flight.get("airline_logo"):
-            return flight["airline_logo"]
-
         legs = flight.get("flights", [])
+        # if flight.get("airline_logo"):
+        #     return flight["airline_logo"]
+
+        # legs = flight.get("flights", [])
         if legs:
             if primary_airline:
                 for leg in legs:
                     if leg.get("airline") == primary_airline and leg.get("airline_logo"):
                         return leg["airline_logo"]
             longest_leg = max(legs, key=lambda leg: leg.get("duration", 0))
-            return longest_leg.get("airline_logo", "https://via.placeholder.com/32")
+            if longest_leg.get("airline_Logo"):
+                return longest_leg["airline_Logo"]
+            # return longest_leg.get("airline_logo", "https://via.placeholder.com/32")
+        if flight.get("airline_logo"):
+            return flight["airline_logo"]
 
         return "https://via.placeholder.com/32" 
 
