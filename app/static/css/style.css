@@ -254,7 +254,7 @@ input:-webkit-autofill:active {
 }
 /* White calendar icon for traveler search date inputs */
 .container.py-4 .neo-card input[type="date"].neo-input {
-    color-scheme: dark;
+    color-scheme: light;
     appearance: auto;
     -webkit-appearance: auto;
 }
