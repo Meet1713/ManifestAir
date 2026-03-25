@@ -111,8 +111,8 @@ class SerpApiProvider:
                     if leg.get("airline") == primary_airline and leg.get("airline_logo"):
                         return leg["airline_logo"]
             longest_leg = max(legs, key=lambda leg: leg.get("duration", 0))
-            if longest_leg.get("airline_Logo"):
-                return longest_leg["airline_Logo"]
+            if longest_leg.get("airline_logo"):
+                return longest_leg["airline_logo"]
             # return longest_leg.get("airline_logo", "https://via.placeholder.com/32")
         if flight.get("airline_logo"):
             return flight["airline_logo"]
