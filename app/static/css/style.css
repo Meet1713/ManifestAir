@@ -252,3 +252,15 @@ input:-webkit-autofill:active {
         margin-bottom: 0;
     }
 }
+/* White calendar icon for traveler search date inputs */
+.container.py-4 .neo-card input[type="date"].neo-input {
+    color-scheme: dark;
+    appearance: auto;
+    -webkit-appearance: auto;
+}
+
+.container.py-4 .neo-card input[type="date"].neo-input::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(2.5);
+    opacity: 1;
+    cursor: pointer;
+}
