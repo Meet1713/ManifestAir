@@ -362,7 +362,7 @@ class SerpApiProvider:
                         "booking_option_title": "",
                         "booking_extensions": [],
                         "deep_link": get_airline_link(primary_airline),
-                        "link_label": "Book on" + primary_airline,
+                        "link_label": "Book on " + primary_airline,
                         "booking_link_ready": True,
                     }
 
