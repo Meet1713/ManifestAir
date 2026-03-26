@@ -1,5 +1,6 @@
 import random
 from app.providers.base import FlightProvider
+from app.airline_links import get_airline_link
 
 class MockProvider(FlightProvider):
     """
@@ -44,18 +45,21 @@ class MockProvider(FlightProvider):
                 r_dep_min = random.choice(["00", "15", "30", "45"])
                 r_arr_min = random.choice(["00", "15", "30", "45"])
                 return_time = f"{r_dep_h:02}:{r_dep_min} - {r_arr_h:02}:{r_arr_min}"
+
             # Build the flight object
             flight = {
                 'provider': airline_name,
                 'logo': airline_logo,
                 'price': price,
-                'stops': random.choice([0, 1]), 
+                'stops': random.choice([0, 1]),
                 'duration': f"{random.randint(5, 14)}h {random.randint(10, 50)}m",
                 'time': outbound_time,
                 'return_time': return_time,
                 'type': 'Round Trip' if return_date else 'One Way',
-                'deep_link': "#" 
+                'deep_link': get_airline_link(airline_name),
+                'book_with': airline_name,
             }
+
             
             results.append(flight)
             
