@@ -34,10 +34,10 @@ def create_app(test_config=None):
 
     @app.context_processor
     def inject_globals():
-    from flask import g
-    return dict(
-        current_rate=get_usd_to_cad_rate(),
-        unread_count=getattr(g, 'unread_count', 0)
-    )
+        from flask import g
+        return dict(
+            current_rate=get_usd_to_cad_rate(),
+            unread_count=getattr(g, 'unread_count', 0)
+        )
 
     return app
