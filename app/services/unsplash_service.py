@@ -1,7 +1,7 @@
 import requests
 
 # Unsplash Access Key
-UNSPLASH_KEY = "4hpNoiAbLWN18eXDRUKt8B9TG0kMsYXGRh8TbMXvOXE"
+UNSPLASH_ACCESS_KEY = os.environ.get('UNSPLASH_ACCESS_KEY')
 
 def fetch_city_image(city_name):
     """

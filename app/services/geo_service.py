@@ -1,7 +1,9 @@
+import os
 import requests
 
 # Key from your uploaded file
-GEOAPIFY_KEY = "2263ff2c79f64ab7b39b8a3fcf58a09a"
+GEOAPIFY_KEY = os.environ.get("GEOAPIFY_KEY", "")
+
 
 # Fallback coordinates for major Canadian cities (prevents 401 crash)
 FALLBACK_COORDS = {
