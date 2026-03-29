@@ -1,3 +1,4 @@
+#import time
 from flask import (
     Blueprint, render_template, request, flash, redirect, url_for, g
 )
@@ -157,6 +158,7 @@ def refresh_all():
     observer = NotificationObserver()
     count = 0
     notifications_sent = 0
+    #start = time.time()
     for watch in watches:
         flights = provider.search_flights(watch['origin'], watch['destination'], watch['depart_date'])
         if flights:
@@ -167,5 +169,12 @@ def refresh_all():
                 subject.notify(lowest['price'], lowest['provider'])
                 notifications_sent += 1
             count += 1
+    #end = time.time()
+    """
+    print(f"[TIME-TEST] refresh_all() executed in {end - start:.4f} seconds")
+    print(f"[TIME-TEST] Watches scanned: {count}")
+    print(f"[TIME-TEST] Alerts generated: {notifications_sent}")
+    print(f"[TIME-TEST] Average time per watch: {(end - start) / count:.4f} seconds" if count > 0 else "")
+    """
     flash(f"Scanned {count} routes. {notifications_sent} Price Alerts generated!")
     return redirect(url_for('admin.dashboard'))
