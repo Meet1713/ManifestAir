@@ -1,3 +1,4 @@
+#import time
 from flask import Blueprint, render_template, request, flash, redirect, url_for, g
 from app.auth import login_required
 from app.db import get_db
@@ -47,8 +48,10 @@ def search():
         
         # Pass all arguments to the provider
         # The new serpapi_prov.py is expecting these 4 arguments now
+        #start = time.time()
         results = provider.search_flights(origin, destination, depart_date, return_date)
-        
+        #end = time.time()
+        #print(f"[TIME-TEST] search_flights() executed in {end - start:.4f} seconds")
         # usd_to_cad_rate = get_usd_to_cad_rate()
         # print(f"🔁 Using USD->CAD rate: {usd_to_cad_rate}")
 
