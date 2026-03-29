@@ -35,14 +35,24 @@
 
                 <div class="col-md-3">
                     <label class="text-muted small mb-1">Depart</label>
-                    <input type="date" name="date" class="form-control neo-input text-white" 
-                           value="{{ date }}" required>
+                    <div class="date-input-wrap">
+                        <input type="date" id="depart-date" name="date" class="form-control neo-input text-white" 
+                               value="{{ date }}" required>
+                        <button type="button" class="date-picker-btn" data-target="depart-date" aria-label="Open depart date">
+                            <i class="far fa-calendar-alt"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="col-md-3" id="return-div" style="display: none;">
                     <label class="text-muted small mb-1">Return</label>
-                    <input type="date" name="return_date" class="form-control neo-input text-white" 
-                           value="{{ return_date }}">
+                    <div class="date-input-wrap">
+                        <input type="date" id="return-date" name="return_date" class="form-control neo-input text-white" 
+                               value="{{ return_date }}">
+                        <button type="button" class="date-picker-btn" data-target="return-date" aria-label="Open return date">
+                            <i class="far fa-calendar-alt"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -115,24 +125,15 @@
                     </h3>
 
                     <div class="d-flex justify-content-end gap-2">
-                     <!--   <form action="{{ url_for('traveler.watch_route') }}" method="post">
+                        <form action="{{ url_for('traveler.watch_route') }}" method="post">
                             <input type="hidden" name="origin" value="{{ origin }}">
                             <input type="hidden" name="destination" value="{{ destination }}">
                             <input type="hidden" name="price" value="{{ flight.price }}">
+                            <input type="hidden" name="depart_date" value="{{ date }}">
                             <button type="submit" class="btn btn-outline-secondary btn-sm" title="Track Price">
                                 <i class="fas fa-bell"></i>
                             </button>
-                        </form>-->
-                        
-                        <form action="{{ url_for('traveler.watch_route') }}" method="post">
-    <input type="hidden" name="origin" value="{{ origin }}">
-    <input type="hidden" name="destination" value="{{ destination }}">
-    <input type="hidden" name="price" value="{{ flight.price }}">
-    <input type="hidden" name="depart_date" value="{{ date }}">
-    <button type="submit" class="btn btn-outline-secondary btn-sm" title="Track Price">
-        <i class="fas fa-bell"></i>
-    </button>
-</form>
+                        </form>
                         
                         <a href="{{ flight.deep_link }}" target="_blank" class="btn btn-primary btn-sm px-4">
                             Book with {{ flight.book_with }}<i class="fas fa-arrow-right ms-1"></i>
@@ -153,20 +154,33 @@
     {% endif %}
 </div>
 
-<!--<div id="exchange-rate-data" data-rate="{{ current_rate }}"></div>-->
-
 <script>
-    // 1. Logic for Return Date toggle
     function toggleReturnDate() {
         const isRoundTrip = document.getElementById('round_trip').checked;
         const returnDiv = document.getElementById('return-div');
         returnDiv.style.display = isRoundTrip ? 'block' : 'none';
     }
 
-    // 2. Logic for Currency Conversion
+    function bindDatePickerButtons() {
+        document.querySelectorAll('.date-picker-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const input = document.getElementById(this.dataset.target);
+                if (!input) return;
+
+                input.focus();
+
+                if (typeof input.showPicker === 'function') {
+                    input.showPicker();
+                } else {
+                    input.click();
+                }
+            });
+        });
+    }
+
     document.getElementById('currencyToggle')?.addEventListener('change', function() {
         const isCAD = this.checked;
-        //const rate = parseFloat(document.getElementById('exchange-rate-data').dataset.rate);
         const prices = document.querySelectorAll('.price-display');
 
         prices.forEach(el => {
@@ -176,9 +190,8 @@
             if (isCAD) {
                 el.innerText = "C$" + cadPrice.toFixed(2);
                 el.classList.remove('text-success');
-                el.classList.add('text-info'); // Change color to indicate change
+                el.classList.add('text-info');
             } else {
-                // Revert to USD
                 el.innerText = "$" + usdPrice.toFixed(2);
                 el.classList.add('text-success');
                 el.classList.remove('text-info');
@@ -186,7 +199,9 @@
         });
     });
 
-    // Run on load
-    window.onload = toggleReturnDate;
+    window.onload = function() {
+        toggleReturnDate();
+        bindDatePickerButtons();
+    };
 </script>
 {% endblock %}

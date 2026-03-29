@@ -252,27 +252,52 @@ input:-webkit-autofill:active {
         margin-bottom: 0;
     }
 }
-/* ===== NATIVE CLICKABLE WHITE CALENDAR ICON ===== */
-.container.py-4 .neo-card input[type="date"].neo-input {
-    color-scheme: dark;
-    -webkit-appearance: auto;
-    appearance: auto;
-    padding-right: 16px;
+/* ===== CUSTOM WHITE CLICKABLE CALENDAR BUTTON FOR SEARCH PAGE ===== */
+.date-input-wrap {
+    position: relative;
 }
 
-.container.py-4 .neo-card input[type="date"].neo-input::-webkit-calendar-picker-indicator {
-    filter: invert(1) brightness(2.5) !important;
-    opacity: 1 !important;
-    cursor: pointer;
-    background: transparent !important;
-    border: none !important;
-    padding: 0;
-    margin: 0;
+.date-input-wrap input[type="date"].neo-input {
+    padding-right: 52px;
+    color: #ffffff !important;
+    color-scheme: dark;
 }
-.container.py-4 .neo-card input[type="date"].neo-input::-webkit-datetime-edit,
-.container.py-4 .neo-card input[type="date"].neo-input::-webkit-datetime-edit-text,
-.container.py-4 .neo-card input[type="date"].neo-input::-webkit-datetime-edit-day-field,
-.container.py-4 .neo-card input[type="date"].neo-input::-webkit-datetime-edit-month-field,
-.container.py-4 .neo-card input[type="date"].neo-input::-webkit-datetime-edit-year-field {
+
+.date-input-wrap input[type="date"].neo-input::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+.date-picker-btn {
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-size: 1.15rem;
+    line-height: 1;
+    padding: 4px;
+    z-index: 5;
+    cursor: pointer;
+}
+
+.date-picker-btn:hover {
+    color: var(--primary-cyan);
+}
+
+.date-picker-btn:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.date-input-wrap input[type="date"].neo-input::-webkit-datetime-edit,
+.date-input-wrap input[type="date"].neo-input::-webkit-datetime-edit-text,
+.date-input-wrap input[type="date"].neo-input::-webkit-datetime-edit-day-field,
+.date-input-wrap input[type="date"].neo-input::-webkit-datetime-edit-month-field,
+.date-input-wrap input[type="date"].neo-input::-webkit-datetime-edit-year-field {
     color: #ffffff;
 }
